@@ -3,6 +3,7 @@ package com.rotacore.client;
 import com.rotacore.RotaCore;
 import com.rotacore.api.RotaCoreRegistry;
 import com.rotacore.api.RotaModule;
+import com.rotacore.client.gui.RotaCoreModulesScreen;
 import com.rotacore.client.gui.RotaHubScreen;
 import com.rotacore.client.gui.widget.RotaButton;
 import com.rotacore.config.RotaCoreConfig;
@@ -52,7 +53,7 @@ public class RotaClientEvents {
         RotaButton hubBtn = new RotaButton(
                 x, y, btnW, btnH,
                 Component.literal("§6★ Rota Mods"),
-                btn -> Minecraft.getInstance().setScreen(new RotaHubScreen(screen))
+                btn -> Minecraft.getInstance().setScreen(new RotaCoreModulesScreen(screen))
         );
         hubBtn.setAccent(true);
         event.addListener(hubBtn);
@@ -112,7 +113,7 @@ public class RotaClientEvents {
         if (showHub) {
             Button hubBtn = Button.builder(
                     Component.literal("Rota Mods Hub..."),
-                    btn -> Minecraft.getInstance().setScreen(new RotaHubScreen(optionsScreen))
+                    btn -> Minecraft.getInstance().setScreen(new RotaCoreModulesScreen(optionsScreen))
             ).bounds(0, 0, 150, 20).build();
 
             buttonsToAdd.add(hubBtn);
@@ -153,7 +154,7 @@ public class RotaClientEvents {
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         while (RotaKeyBindings.OPEN_HUB.consumeClick()) {
-            mc.setScreen(new RotaHubScreen(mc.screen));
+            mc.setScreen(new RotaCoreModulesScreen(mc.screen));
         }
     }
 }

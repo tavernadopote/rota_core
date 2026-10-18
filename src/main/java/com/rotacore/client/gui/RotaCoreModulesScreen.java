@@ -94,7 +94,7 @@ public class RotaCoreModulesScreen extends Screen {
         int titleX = 105;
         int listWidth = (int) (this.width * 0.65);
         int maxTitleWidth = listWidth - titleX - 8;
-        String titleStr = "§6§lGerenciador de Módulos & Opções";
+        String titleStr = "§6§l★ Rota Mods Hub ★";
         if (this.font.width(titleStr) > maxTitleWidth) {
             titleStr = this.font.plainSubstrByWidth(titleStr, maxTitleWidth - 8) + "...";
         }
