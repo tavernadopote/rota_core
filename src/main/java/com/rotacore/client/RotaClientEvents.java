@@ -52,7 +52,7 @@ public class RotaClientEvents {
 
         RotaButton hubBtn = new RotaButton(
                 x, y, btnW, btnH,
-                Component.literal("§6★ Rota Mods"),
+                Component.literal("§6Rota Mods"),
                 btn -> Minecraft.getInstance().setScreen(new RotaCoreModulesScreen(screen))
         );
         hubBtn.setAccent(true);

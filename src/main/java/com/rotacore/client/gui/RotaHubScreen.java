@@ -39,7 +39,7 @@ public class RotaHubScreen extends Screen {
         // Aba 0: Visão Geral
         this.addRenderableWidget(new RotaTabButton(
                 tabX, tabY, tabWidth, tabHeight,
-                Component.literal("★ Visão Geral"),
+                Component.literal("Visão Geral"),
                 selectedTab == 0,
                 () -> {
                     this.selectedTab = 0;
@@ -123,7 +123,7 @@ public class RotaHubScreen extends Screen {
         super.render(graphics, mouseX, mouseY, partialTick);
 
         // Cabeçalho Principal
-        graphics.drawCenteredString(this.font, "§6§l★ ROTA MODS HUB ★", this.width / 2, 12, RotaTheme.TEXT_TITLE);
+        graphics.drawCenteredString(this.font, "§6§lROTA MODS HUB", this.width / 2, 12, RotaTheme.TEXT_TITLE);
         graphics.drawString(this.font, "§8v1.0.0", this.width - 44, 12, RotaTheme.TEXT_MUTED, false);
 
         // Linha divisória abaixo das abas

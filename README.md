@@ -8,8 +8,8 @@ Desenvolvida especialmente para **Minecraft 1.21.1 (NeoForge)**, ela substitui b
 
 ## ✨ Principais Funcionalidades
 
-- **★ Hub Universal de Mods (Rota Hub)**: Um painel central com abas que unifica a navegação e configuração de todos os mods da suíte (`Rota Roads`, `Rota Quests`, etc.).
-- **Integração no Menu de Pausa (ESC)**: Botão estilizado `★ Rota Mods` inserido de forma limpa no menu de pausa do jogador e tecla de atalho configurável (`O`).
+- **Hub Universal de Mods (Rota Hub)**: Um painel central com abas que unifica a navegação e configuração de todos os mods da suíte (`Rota Roads`, `Rota Quests`, etc.).
+- **Integração no Menu de Pausa (ESC)**: Botão estilizado `Rota Mods` inserido de forma limpa no menu de pausa do jogador e tecla de atalho configurável (`O`).
 - **Widgets Visuais Nativos**: Botões com hover dourado (`RotaButton`), seletores numéricos (`RotaSlider`), interruptores toggle modernos (`RotaSwitch`) e abas superiores (`RotaTabButton`).
 - **Layout Inspector de 2 Colunas**: Tela com controles roláveis à esquerda e painel de inspeção à direita com descrições detalhadas, valores padrão recomendados, dicas em tempo real e barra de busca instantânea.
 - **Gerenciador de Configuração JSON Sem Dependências**: Serialização e desserialização automática em `config/<mod_id>.json` utilizando o GSON nativo do Minecraft.

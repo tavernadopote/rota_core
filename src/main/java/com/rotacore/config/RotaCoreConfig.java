@@ -10,7 +10,7 @@ import java.util.Map;
 public class RotaCoreConfig {
 
     /**
-     * Exibe o botão ★ Rota Mods no menu de pausa (ESC).
+     * Exibe o botão Rota Mods no menu de pausa (ESC).
      */
     public boolean showPauseMenuButton = true;
 

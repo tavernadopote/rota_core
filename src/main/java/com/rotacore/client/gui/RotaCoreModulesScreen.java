@@ -94,7 +94,7 @@ public class RotaCoreModulesScreen extends Screen {
         int titleX = 105;
         int listWidth = (int) (this.width * 0.65);
         int maxTitleWidth = listWidth - titleX - 8;
-        String titleStr = "§6§l★ Rota Mods Hub ★";
+        String titleStr = "§6§lRota Mods Hub";
         if (this.font.width(titleStr) > maxTitleWidth) {
             titleStr = this.font.plainSubstrByWidth(titleStr, maxTitleWidth - 8) + "...";
         }
@@ -356,7 +356,7 @@ public class RotaCoreModulesScreen extends Screen {
             }
 
             int textY = top + (height - 18) / 2;
-            graphics.drawString(mc.font, "§6★ Rota Mods Hub (Geral)", left + 8, textY, 0xFFFFAA00, false);
+            graphics.drawString(mc.font, "§6Rota Mods Hub (Geral)", left + 8, textY, 0xFFFFAA00, false);
             graphics.drawString(mc.font, "Exibir botão do Hub na tela de Opções", left + 8, textY + 10, RotaTheme.TEXT_MUTED, false);
 
             int toggleX = left + width - 32 - 102;
