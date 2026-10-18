@@ -65,7 +65,7 @@ public class RotaCategoryScreen extends Screen {
 
         // 2. Botão Voltar no Canto Superior Esquerdo
         this.addRenderableWidget(
-                new RotaButton(12, 8, 120, 20, Component.literal("← Voltar ao Menu"), btn -> {
+                new RotaButton(12, 8, 85, 20, Component.literal("← Voltar"), btn -> {
                     saveAndClose();
                 })
         );
@@ -109,11 +109,17 @@ public class RotaCategoryScreen extends Screen {
         // Fundo padrão
         super.render(graphics, mouseX, mouseY, partialTick);
 
-        // Título da Categoria Centralizado na Barra Superior
-        graphics.drawCenteredString(this.font, this.category.getTitle(), (int) (this.width * 0.35), 14, RotaTheme.TEXT_TITLE);
+        // Título da Categoria alinhado à direita do botão Voltar (sem sobreposição)
+        int titleX = 105;
+        int listWidth = (int) (this.width * 0.65);
+        int maxTitleWidth = listWidth - titleX - 8;
+        String titleStr = this.category.getTitle().getString();
+        if (this.font.width(titleStr) > maxTitleWidth) {
+            titleStr = this.font.plainSubstrByWidth(titleStr, maxTitleWidth - 8) + "...";
+        }
+        graphics.drawString(this.font, titleStr, titleX, 14, RotaTheme.TEXT_TITLE, false);
 
         // Divisória Vertical entre a Lista e o Painel Inspector
-        int listWidth = (int) (this.width * 0.65);
         int topY = 36;
         int bottomY = this.height - 36;
         graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, RotaTheme.BORDER_SECONDARY);
