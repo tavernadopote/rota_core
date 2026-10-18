@@ -18,10 +18,10 @@ public class RotaCoreClient {
         // Registra eventos de interface e tick no barramento do NeoForge
         NeoForge.EVENT_BUS.register(RotaClientEvents.class);
 
-        // Registra o Rota Hub como tela de configuração no menu de Mods do NeoForge
+        // Registra o gerenciador de módulos como tela de configuração no menu de Mods do NeoForge
         modContainer.registerExtensionPoint(
                 IConfigScreenFactory.class,
-                (container, screen) -> new RotaHubScreen(screen)
+                (container, screen) -> new com.rotacore.client.gui.RotaCoreModulesScreen(screen)
         );
     }
 }

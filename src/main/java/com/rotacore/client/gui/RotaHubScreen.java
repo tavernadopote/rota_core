@@ -48,6 +48,19 @@ public class RotaHubScreen extends Screen {
         ));
         tabX += tabWidth + 4;
 
+        // Aba 1: Rota Core (Gerenciador de Integrações e Opções)
+        this.addRenderableWidget(new RotaTabButton(
+                tabX, tabY, 95, tabHeight,
+                Component.literal("⚙ Rota Core"),
+                false,
+                () -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.setScreen(new RotaCoreModulesScreen(this));
+                    }
+                }
+        ));
+        tabX += 95 + 4;
+
         // Abas dos módulos registrados
         for (int i = 0; i < modules.size(); i++) {
             RotaModule mod = modules.get(i);
