@@ -1,0 +1,12 @@
+{
+  "key.categories.rota_core": "Rota Mods",
+  "key.rota_core.open_hub": "Open Rota Mods Hub",
+  "gui.rota_core.hub_title": "Rota Mods — Central Hub",
+  "gui.rota_core.no_modules": "No Rota Mods modules installed.",
+  "gui.rota_core.close": "Close",
+  "gui.rota_core.save": "Save Changes",
+  "gui.rota_core.reset": "Reset Defaults",
+  "gui.rota_core.back": "Back",
+  "gui.rota_core.module_version": "Version: %s",
+  "gui.rota_core.tab_dashboard": "Dashboard"
+}

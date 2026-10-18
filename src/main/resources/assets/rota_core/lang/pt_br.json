@@ -1,0 +1,12 @@
+{
+  "key.categories.rota_core": "Rota Mods",
+  "key.rota_core.open_hub": "Abrir Painel Rota Mods",
+  "gui.rota_core.hub_title": "Rota Mods — Painel Central",
+  "gui.rota_core.no_modules": "Nenhum módulo da Rota Mods encontrado.",
+  "gui.rota_core.close": "Fechar",
+  "gui.rota_core.save": "Salvar Alterações",
+  "gui.rota_core.reset": "Restaurar Padrões",
+  "gui.rota_core.back": "Voltar",
+  "gui.rota_core.module_version": "Versão: %s",
+  "gui.rota_core.tab_dashboard": "Visão Geral"
+}
