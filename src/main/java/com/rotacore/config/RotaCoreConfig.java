@@ -36,9 +36,50 @@ public class RotaCoreConfig {
         }
     }
 
+    // =========================================================================
+    // Zoneamento Regional e Geração de Estruturas Controlada
+    // =========================================================================
+    /**
+     * Habilita a orquestração controlada de posicionamento de vilas e postos no mundo.
+     */
+    public boolean enableControlledWorldgen = true;
+
+    /**
+     * Tamanho da célula regional em chunks (padrão: 48 chunks = 768 blocos).
+     */
+    public int regionalCellSizeChunks = 48;
+
+    /**
+     * Distância mínima entre vilas/assentamentos em blocos (padrão: 700).
+     */
+    public int minVillageSeparationBlocks = 700;
+
+    /**
+     * Distância mínima entre um posto militar (pillager outpost) e a vila mais próxima em blocos (padrão: 450).
+     */
+    public int minOutpostFromVillageBlocks = 450;
+
+    /**
+     * Se verdadeiro, analisa a variação de relevo e move o ponto da vila para o vale/platô mais plano da região.
+     */
+    public boolean terrainSuitabilityCheck = true;
+
+    /**
+     * Variação máxima de altura tolerada em blocos para aprovar a localização de uma vila (padrão: 8).
+     */
+    public int maxVillageHeightVariance = 8;
+
     public void validate() {
         if (moduleOptionsEnabled == null) {
             moduleOptionsEnabled = new LinkedHashMap<>();
         }
+        if (regionalCellSizeChunks < 24) regionalCellSizeChunks = 24;
+        if (regionalCellSizeChunks > 128) regionalCellSizeChunks = 128;
+        if (minVillageSeparationBlocks < 300) minVillageSeparationBlocks = 300;
+        if (minVillageSeparationBlocks > 2000) minVillageSeparationBlocks = 2000;
+        if (minOutpostFromVillageBlocks < 200) minOutpostFromVillageBlocks = 200;
+        if (minOutpostFromVillageBlocks > 1000) minOutpostFromVillageBlocks = 1000;
+        if (maxVillageHeightVariance < 4) maxVillageHeightVariance = 4;
+        if (maxVillageHeightVariance > 24) maxVillageHeightVariance = 24;
     }
 }
