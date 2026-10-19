@@ -3,9 +3,8 @@
   "minVersion": "0.8",
   "package": "com.rotacore.mixin",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "rota_core.refmap.json",
   "mixins": [
-    "RandomSpreadStructurePlacementMixin"
+    "StructurePlacementMixin"
   ],
   "client": [
   ],

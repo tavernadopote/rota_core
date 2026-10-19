@@ -6,19 +6,19 @@ import com.rotacore.world.zoning.RegionalGrid;
 import com.rotacore.world.zoning.StructureZoneRegistry;
 import com.rotacore.world.zoning.ZoneType;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
-import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Intercepta o cálculo determinístico de elegibilidade de chunks para estruturas RandomSpread.
+ * Intercepta o cálculo determinístico de elegibilidade de chunks para estruturas.
  * Permite que vilas (vanilla ou mods como CTOV) e postos militares sejam orquestrados pelo
  * Zoneamento Regional do Rota Core, garantindo distribuição lógica, relevo ideal e sem sobreposições.
  */
-@Mixin(RandomSpreadStructurePlacement.class)
-public class RandomSpreadStructurePlacementMixin {
+@Mixin(StructurePlacement.class)
+public class StructurePlacementMixin {
 
     @Inject(method = "isStructureChunk", at = @At("HEAD"), cancellable = true)
     private void rota$interceptStructureChunk(
@@ -32,7 +32,7 @@ public class RandomSpreadStructurePlacementMixin {
             return;
         }
 
-        RandomSpreadStructurePlacement placement = (RandomSpreadStructurePlacement) (Object) this;
+        StructurePlacement placement = (StructurePlacement) (Object) this;
         ZoneType zoneType = StructureZoneRegistry.getZoneType(structureState, placement);
 
         if (zoneType == ZoneType.SETTLEMENT) {

@@ -45,14 +45,14 @@ public class RotaCoreConfig {
     public boolean enableControlledWorldgen = true;
 
     /**
-     * Tamanho da célula regional em chunks (padrão: 48 chunks = 768 blocos).
+     * Tamanho da célula regional em chunks (padrão: 38 chunks = ~608 blocos).
      */
-    public int regionalCellSizeChunks = 48;
+    public int regionalCellSizeChunks = 38;
 
     /**
-     * Distância mínima entre vilas/assentamentos em blocos (padrão: 700).
+     * Distância mínima entre vilas/assentamentos em blocos (padrão: 500).
      */
-    public int minVillageSeparationBlocks = 700;
+    public int minVillageSeparationBlocks = 500;
 
     /**
      * Distância mínima entre um posto militar (pillager outpost) e a vila mais próxima em blocos (padrão: 450).
