@@ -41,8 +41,9 @@ public class RotaCoreConfig {
     // =========================================================================
     /**
      * Habilita a orquestração controlada de posicionamento de vilas e postos no mundo.
+     * Desativado por padrão para preservar 100% da integridade da distribuição natural de biomas do Minecraft/CTOV.
      */
-    public boolean enableControlledWorldgen = true;
+    public boolean enableControlledWorldgen = false;
 
     /**
      * Tamanho da célula regional em chunks (padrão: 38 chunks = ~608 blocos).
