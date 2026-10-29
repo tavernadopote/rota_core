@@ -28,11 +28,19 @@ public class RotaCategoryScreen extends Screen {
     private EditBox searchBox;
     private RotaConfigOption focusedOption;
 
+    public RotaCategoryScreen(Screen parentHub, RotaCategory category) {
+        this(parentHub, category, null);
+    }
+
     public RotaCategoryScreen(Screen parentHub, RotaCategory category, Runnable onSaveAction) {
         super(category.getTitle());
         this.parentHub = parentHub;
         this.category = category;
         this.onSaveAction = onSaveAction;
+    }
+
+    public Screen getParentHub() {
+        return parentHub;
     }
 
     public void setFocusedOption(RotaConfigOption option) {

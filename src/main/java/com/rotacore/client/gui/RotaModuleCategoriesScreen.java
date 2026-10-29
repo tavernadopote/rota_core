@@ -7,6 +7,7 @@ import com.rotacore.client.gui.widget.RotaButton;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
@@ -92,9 +93,35 @@ public class RotaModuleCategoriesScreen extends Screen {
 
         // Barra inferior de status com a descrição da categoria focada
         if (!hoveredDescription.isEmpty()) {
-            int barY = this.height - 56;
-            graphics.fill(this.width / 2 - 250, barY - 2, this.width / 2 + 250, barY + 12, 0x88000000);
-            graphics.drawCenteredString(this.font, "§e" + hoveredDescription, this.width / 2, barY, 0xFFFFFF);
+            int maxTextWidth = Math.min(460, this.width - 40);
+            List<FormattedCharSequence> lines = this.font.split(Component.literal("§e" + hoveredDescription), maxTextWidth);
+            int lineHeight = 11;
+            int totalTextHeight = lines.size() * lineHeight;
+            int paddingX = 10;
+            int paddingY = 4;
+
+            int maxLineWidth = 0;
+            for (FormattedCharSequence line : lines) {
+                maxLineWidth = Math.max(maxLineWidth, this.font.width(line));
+            }
+
+            int boxWidth = Math.min(maxLineWidth + paddingX * 2, this.width - 20);
+            int boxHeight = totalTextHeight + paddingY * 2;
+            int boxX = (this.width - boxWidth) / 2;
+            int doneY = this.height - 34; // posição Y do botão Concluído
+            int boxY = doneY - boxHeight - 6;
+
+            // Fundo escuro translúcido com contorno sutil
+            graphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x99000000);
+            graphics.renderOutline(boxX, boxY, boxWidth, boxHeight, 0x44FFFFFF);
+
+            // Renderiza cada linha centralizada
+            int textY = boxY + paddingY;
+            for (FormattedCharSequence line : lines) {
+                int lineWidth = this.font.width(line);
+                graphics.drawString(this.font, line, (this.width - lineWidth) / 2, textY, 0xFFFFFF, false);
+                textY += lineHeight;
+            }
         }
     }
 
