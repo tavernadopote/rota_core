@@ -51,7 +51,7 @@ public class RotaHubScreen extends Screen {
         // Aba 1: Rota Core (Gerenciador de Integrações e Opções)
         this.addRenderableWidget(new RotaTabButton(
                 tabX, tabY, 95, tabHeight,
-                Component.literal("⚙ Rota Core"),
+                Component.literal("Rota Core"),
                 false,
                 () -> {
                     if (this.minecraft != null) {

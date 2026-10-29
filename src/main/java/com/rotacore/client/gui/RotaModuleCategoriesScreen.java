@@ -66,7 +66,7 @@ public class RotaModuleCategoriesScreen extends Screen {
         this.addRenderableWidget(
                 new RotaButton(doneX, doneY, doneWidth, 22, Component.literal("Concluído"), btn -> {
                     saveAndClose();
-                }).setAccent(true)
+                })
         );
     }
 
@@ -84,8 +84,8 @@ public class RotaModuleCategoriesScreen extends Screen {
         super.render(graphics, mouseX, mouseY, partialTick);
 
         // Título e Subtítulo
-        graphics.drawCenteredString(this.font, module.getDisplayName(), this.width / 2, 16, RotaTheme.TEXT_TITLE);
-        graphics.drawCenteredString(this.font, Component.translatable("gui.rota_core.module_version", module.getVersion()), this.width / 2, 29, RotaTheme.TEXT_MUTED);
+        graphics.drawCenteredString(this.font, "§6§l" + module.getDisplayName().getString(), this.width / 2, 16, 0xFFFFAA00);
+        graphics.drawCenteredString(this.font, "§7Menu de Configurações - Selecione uma área para personalizar", this.width / 2, 29, 0xFFAAAAAA);
 
         // Atualiza a legenda inferior com base no botão sob o cursor
         detectHoveredDescription(mouseX, mouseY);

@@ -82,7 +82,7 @@ public class RotaCategoryScreen extends Screen {
         this.addRenderableWidget(
                 new RotaButton(150, this.height - 28, 120, 20, Component.literal("Salvar Alterações"), btn -> {
                     saveAndClose();
-                }).setAccent(true)
+                })
         );
 
         // 5. Caixa de Busca no Rodapé Direito (Abaixo do Painel Inspector)
@@ -117,54 +117,54 @@ public class RotaCategoryScreen extends Screen {
         if (this.font.width(titleStr) > maxTitleWidth) {
             titleStr = this.font.plainSubstrByWidth(titleStr, maxTitleWidth - 8) + "...";
         }
-        graphics.drawString(this.font, titleStr, titleX, 14, RotaTheme.TEXT_TITLE, false);
+        graphics.drawString(this.font, titleStr, titleX, 14, 0xFFFFAA00, false);
 
         // Divisória Vertical entre a Lista e o Painel Inspector
         int topY = 36;
         int bottomY = this.height - 36;
-        graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, RotaTheme.BORDER_SECONDARY);
+        graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, 0xFF444444);
 
         // Renderiza o Painel Inspector à Direita (~35% da Tela)
         renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY);
     }
 
     private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height) {
-        // Fundo do painel
-        graphics.fill(x, y, x + width, y + height, RotaTheme.PANEL_BG);
-        graphics.renderOutline(x, y, width, height, RotaTheme.BORDER_SECONDARY);
+        // Fundo escuro com borda suave
+        graphics.fill(x, y, x + width, y + height, 0xCC111111);
+        graphics.renderOutline(x, y, width, height, 0xFF555555);
 
         int innerX = x + 12;
         int innerY = y + 10;
         int innerWidth = width - 24;
 
         if (focusedOption == null) {
-            graphics.drawString(this.font, "§6Ajuda & Descrição", innerX, innerY, RotaTheme.TEXT_TITLE, false);
-            graphics.fill(innerX, innerY + 12, innerX + innerWidth, innerY + 13, RotaTheme.BORDER_SECONDARY);
+            graphics.drawString(this.font, "§6Ajuda & Descrição", innerX, innerY, 0xFFFFAA00, false);
+            graphics.fill(innerX, innerY + 12, innerX + innerWidth, innerY + 13, 0xFF444444);
             List<FormattedCharSequence> lines = this.font.split(
-                    Component.literal("§7Passe o cursor sobre qualquer configuração à esquerda para ver a explicação detalhada, valores padrão e dicas de funcionamento."),
+                    Component.literal("§7Passe o mouse ou clique sobre qualquer configuração à esquerda para ver a explicação detalhada, valores padrão e dicas de funcionamento."),
                     innerWidth
             );
             int textY = innerY + 20;
             for (FormattedCharSequence line : lines) {
-                graphics.drawString(this.font, line, innerX, textY, RotaTheme.TEXT_MUTED, false);
+                graphics.drawString(this.font, line, innerX, textY, 0xFFCCCCCC, false);
                 textY += 11;
             }
             return;
         }
 
-        // Título da Opção em Destaque
+        // Título da Opção em Destaque (com quebra se for longo)
         List<FormattedCharSequence> titleLines = this.font.split(
                 Component.literal("§6§l" + focusedOption.getTitle().getString()),
                 innerWidth
         );
         int curY = innerY;
         for (FormattedCharSequence tLine : titleLines) {
-            graphics.drawString(this.font, tLine, innerX, curY, RotaTheme.TEXT_TITLE, false);
+            graphics.drawString(this.font, tLine, innerX, curY, 0xFFFFAA00, false);
             curY += 12;
         }
-        graphics.fill(innerX, curY + 2, innerX + innerWidth, curY + 3, RotaTheme.BORDER_SECONDARY);
+        graphics.fill(innerX, curY + 2, innerX + innerWidth, curY + 3, 0xFF555555);
 
-        // Descrição Detalhada
+        // Descrição Detalhada com Quebra Automática de Linha
         int textY = curY + 8;
         String desc = focusedOption.getDescription();
         if (desc != null && !desc.isEmpty()) {
@@ -173,18 +173,18 @@ public class RotaCategoryScreen extends Screen {
                     innerWidth
             );
             for (FormattedCharSequence line : descLines) {
-                graphics.drawString(this.font, line, innerX, textY, RotaTheme.TEXT_BODY, false);
+                graphics.drawString(this.font, line, innerX, textY, 0xFFEEEEEE, false);
                 textY += 11;
             }
         }
 
         textY += 8;
 
-        // Dica Prática / Exemplo
+        // Bloco de Dicas / Exemplos Práticos
         if (focusedOption.getExampleTip() != null && !focusedOption.getExampleTip().isEmpty()) {
-            graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF2A2F3A);
+            graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
             textY += 4;
-            graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, RotaTheme.TEXT_TITLE, false);
+            graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
             textY += 12;
 
             List<FormattedCharSequence> tipLines = this.font.split(
@@ -198,14 +198,14 @@ public class RotaCategoryScreen extends Screen {
             textY += 8;
         }
 
-        // Valor Padrão
+        // Valor Padrão (com quebra para não vazar da caixa)
         if (focusedOption.getDefaultValueText() != null && !focusedOption.getDefaultValueText().isEmpty()) {
             List<FormattedCharSequence> defaultLines = this.font.split(
                     Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
                     innerWidth
             );
             for (FormattedCharSequence line : defaultLines) {
-                graphics.drawString(this.font, line, innerX, textY, RotaTheme.TEXT_MUTED, false);
+                graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
                 textY += 11;
             }
         }

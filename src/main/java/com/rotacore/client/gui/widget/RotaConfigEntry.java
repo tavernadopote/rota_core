@@ -142,15 +142,15 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
 
         if (option.getType() == RotaConfigOption.Type.HEADER) {
             int textY = top + (height - 9) / 2;
-            graphics.drawString(mc.font, option.getTitle(), left + 6, textY, RotaTheme.TEXT_TITLE, false);
+            graphics.drawString(mc.font, option.getTitle(), left + 6, textY, 0xFFFFAA00, false);
             int lineY = textY + 11;
-            graphics.fill(left + 6, lineY, left + width - 12, lineY + 1, RotaTheme.BORDER_SECONDARY);
+            graphics.fill(left + 6, lineY, left + width - 12, lineY + 1, 0xFF555555);
             return;
         }
 
         // Destaque suave ao passar o cursor
         if (isHovered) {
-            graphics.fill(left, top, left + width - 4, top + height, 0x1EFFFFFF);
+            graphics.fill(left, top, left + width - 4, top + height, 0x22FFFFFF);
         }
 
         // Título da opção
@@ -160,7 +160,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
         if (mc.font.width(titleStr) > maxTextWidth) {
             titleStr = mc.font.plainSubstrByWidth(titleStr, maxTextWidth - 8) + "...";
         }
-        graphics.drawString(mc.font, titleStr, left + 6, textY, isHovered ? 0xFFFFFFFF : RotaTheme.TEXT_BODY, false);
+        graphics.drawString(mc.font, titleStr, left + 6, textY, isHovered ? 0xFFFFFFFF : 0xFFDDDDDD, false);
 
         // Renderiza o controle posicionado à direita
         int controlX = left + width - 130;

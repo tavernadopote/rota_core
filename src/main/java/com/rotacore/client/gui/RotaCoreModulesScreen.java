@@ -103,15 +103,15 @@ public class RotaCoreModulesScreen extends Screen {
         // Divisória Vertical
         int topY = 36;
         int bottomY = this.height - 36;
-        graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, RotaTheme.BORDER_SECONDARY);
+        graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, 0xFF444444);
 
         // Painel Inspector à Direita (~35% da Tela)
         renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY);
     }
 
     private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height) {
-        graphics.fill(x, y, x + width, y + height, RotaTheme.PANEL_BG);
-        graphics.renderOutline(x, y, width, height, RotaTheme.BORDER_SECONDARY);
+        graphics.fill(x, y, x + width, y + height, 0xCC111111);
+        graphics.renderOutline(x, y, width, height, 0xFF555555);
 
         int innerX = x + 12;
         int innerY = y + 10;
