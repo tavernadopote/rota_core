@@ -125,10 +125,10 @@ public class RotaCategoryScreen extends Screen {
         graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, 0xFF444444);
 
         // Renderiza o Painel Inspector à Direita (~35% da Tela)
-        renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY);
+        renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY, mouseX, mouseY);
     }
 
-    private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height) {
+    private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height, int mouseX, int mouseY) {
         // Fundo escuro com borda suave
         graphics.fill(x, y, x + width, y + height, 0xCC111111);
         graphics.renderOutline(x, y, width, height, 0xFF555555);
@@ -207,6 +207,56 @@ public class RotaCategoryScreen extends Screen {
             for (FormattedCharSequence line : defaultLines) {
                 graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
                 textY += 11;
+            }
+        }
+
+        // Galeria de Pre-visualizacao de Icones (quando a opcao fornece previews)
+        if (focusedOption.hasIconPreviews()) {
+            java.util.List<com.rotacore.config.RotaIconPreview> previews = focusedOption.getIconPreviews();
+            textY += 6;
+            graphics.fill(innerX, textY, innerX + innerWidth, textY + 1, 0xFF444444);
+            textY += 6;
+
+            graphics.drawString(this.font, "§6§lÍcones Incluídos §7(" + previews.size() + "):", innerX, textY, 0xFFFFAA00, false);
+            textY += 13;
+
+            int slotSize = 22;
+            int gap = 3;
+            int cols = Math.max(1, (innerWidth + gap) / (slotSize + gap));
+            int maxY = y + height - 8;
+
+            com.rotacore.config.RotaIconPreview hoveredPreview = null;
+
+            for (int i = 0; i < previews.size(); i++) {
+                int col = i % cols;
+                int row = i / cols;
+                int slotX = innerX + col * (slotSize + gap);
+                int slotY = textY + row * (slotSize + gap);
+
+                if (slotY + slotSize > maxY) {
+                    break;
+                }
+
+                boolean isHovered = mouseX >= slotX && mouseX < slotX + slotSize && mouseY >= slotY && mouseY < slotY + slotSize;
+
+                // Fundo e contorno do slot
+                graphics.fill(slotX, slotY, slotX + slotSize, slotY + slotSize, 0xEE1E1E1E);
+                graphics.renderOutline(slotX, slotY, slotSize, slotSize, isHovered ? 0xFFFFAA00 : 0xFF444444);
+
+                com.rotacore.config.RotaIconPreview prev = previews.get(i);
+                int iconOffset = (slotSize - 16) / 2;
+                try {
+                    graphics.blit(prev.texture(), slotX + iconOffset, slotY + iconOffset, 16, 16, 0.0f, 0.0f, 1, 1, 1, 1);
+                } catch (Throwable ignored) {
+                }
+
+                if (isHovered) {
+                    hoveredPreview = prev;
+                }
+            }
+
+            if (hoveredPreview != null && hoveredPreview.label() != null && !hoveredPreview.label().getString().isEmpty()) {
+                graphics.renderTooltip(this.font, hoveredPreview.label(), mouseX, mouseY);
             }
         }
     }

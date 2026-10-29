@@ -46,6 +46,8 @@ public class RotaConfigOption {
     private Runnable actionCallback;
     private String actionButtonText;
 
+    private java.util.List<RotaIconPreview> iconPreviews = java.util.List.of();
+
     private RotaConfigOption(Type type, Component title, String description, String exampleTip, String defaultValueText) {
         this.type = type;
         this.title = title;
@@ -200,4 +202,21 @@ public class RotaConfigOption {
 
     public String getActionButtonText() { return actionButtonText != null ? actionButtonText : "Abrir"; }
     public void triggerAction() { if (actionCallback != null) actionCallback.run(); }
+
+    public RotaConfigOption withIconPreviews(java.util.List<RotaIconPreview> previews) {
+        if (previews != null) {
+            this.iconPreviews = java.util.List.copyOf(previews);
+        } else {
+            this.iconPreviews = java.util.List.of();
+        }
+        return this;
+    }
+
+    public java.util.List<RotaIconPreview> getIconPreviews() {
+        return iconPreviews;
+    }
+
+    public boolean hasIconPreviews() {
+        return iconPreviews != null && !iconPreviews.isEmpty();
+    }
 }
