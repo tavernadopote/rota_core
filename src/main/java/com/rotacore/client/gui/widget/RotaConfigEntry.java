@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
@@ -25,18 +26,21 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
     private final List<NarratableEntry> narratables = new ArrayList<>();
 
     private AbstractWidget controlWidget;
+    private RotaButton secondaryButton;
 
     public RotaConfigEntry(RotaConfigOption option, RotaCategoryScreen parentScreen, int controlWidth) {
         this.option = option;
         this.parentScreen = parentScreen;
 
         int btnWidth = Math.max(120, controlWidth);
+        boolean hasSecondary = option.hasSecondaryAction();
+        int mainBtnWidth = hasSecondary ? (btnWidth - 24) : btnWidth;
         int btnHeight = 20;
 
         switch (option.getType()) {
             case BOOLEAN -> {
                 RotaSwitch toggle = new RotaSwitch(
-                        0, 0, btnWidth, btnHeight,
+                        0, 0, mainBtnWidth, btnHeight,
                         option.getBooleanValue(),
                         option::setBooleanValue
                 );
@@ -51,7 +55,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 double initialRatio = (option.getIntValue() - min) / range;
 
                 RotaSlider slider = new RotaSlider(
-                        0, 0, btnWidth, btnHeight,
+                        0, 0, mainBtnWidth, btnHeight,
                         initialRatio,
                         ratio -> {
                             int current = min + (int) Math.round(ratio * range);
@@ -73,7 +77,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 double initialRatio = (option.getDoubleValue() - min) / range;
 
                 RotaSlider slider = new RotaSlider(
-                        0, 0, btnWidth, btnHeight,
+                        0, 0, mainBtnWidth, btnHeight,
                         initialRatio,
                         ratio -> {
                             double current = min + ratio * range;
@@ -90,7 +94,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             }
             case CYCLE -> {
                 RotaButton button = new RotaButton(
-                        0, 0, btnWidth, btnHeight,
+                        0, 0, mainBtnWidth, btnHeight,
                         Component.literal(option.getCycleText()),
                         btn -> {
                             option.triggerCycle();
@@ -103,7 +107,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             }
             case ACTION -> {
                 RotaButton button = new RotaButton(
-                        0, 0, btnWidth, btnHeight,
+                        0, 0, mainBtnWidth, btnHeight,
                         Component.literal(option.getActionButtonText()),
                         btn -> option.triggerAction()
                 );
@@ -116,9 +120,31 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             }
         }
 
+        if (hasSecondary) {
+            this.secondaryButton = new RotaButton(
+                    0, 0, 20, 20,
+                    Component.literal("⚙"),
+                    btn -> {
+                        if (option.getSecondaryAction() != null) {
+                            option.getSecondaryAction().run();
+                        }
+                    }
+            );
+            if (option.getSecondaryActionTooltip() != null) {
+                this.secondaryButton.setTooltip(Tooltip.create(option.getSecondaryActionTooltip()));
+            }
+            this.children.add(this.secondaryButton);
+            this.narratables.add(this.secondaryButton);
+        }
+
         Minecraft mc = Minecraft.getInstance();
-        if (this.controlWidget != null && !option.canPlayerEdit(mc)) {
-            this.controlWidget.active = false;
+        if (mc != null && !option.canPlayerEdit(mc)) {
+            if (this.controlWidget != null) {
+                this.controlWidget.active = false;
+            }
+            if (this.secondaryButton != null) {
+                this.secondaryButton.active = false;
+            }
         }
     }
 
@@ -182,6 +208,22 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             controlWidget.setY(controlY);
             controlWidget.render(graphics, mouseX, mouseY, partialTick);
         }
+
+        if (secondaryButton != null) {
+            secondaryButton.active = canEdit;
+            int secondaryX = controlX + (controlWidget != null ? controlWidget.getWidth() : 0) + 4;
+            secondaryButton.setX(secondaryX);
+            secondaryButton.setY(controlY);
+            secondaryButton.render(graphics, mouseX, mouseY, partialTick);
+        }
+    }
+
+    public AbstractWidget getControlWidget() {
+        return controlWidget;
+    }
+
+    public RotaButton getSecondaryButton() {
+        return secondaryButton;
     }
 
     @Override
