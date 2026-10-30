@@ -147,8 +147,28 @@ public class RotaHudEditScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        // No-op para evitar o shader de blur do Minecraft cobrindo o editor
+    }
+
+    @Override
+    protected void renderBlurredBackground(float partialTick) {
+        // No-op
+    }
+
+    @Override
+    protected void renderMenuBackground(GuiGraphics graphics) {
+        // No-op
+    }
+
+    @Override
+    protected void renderMenuBackground(GuiGraphics graphics, int x, int y, int width, int height) {
+        // No-op
+    }
+
+    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // 1. Fundo escurecido semi-transparente
+        // 1. Fundo escurecido semi-transparente limpo sem blur
         graphics.fill(0, 0, this.width, this.height, 0x88000000);
 
         // 2. Guias magnéticas sutis ao arrastar
