@@ -148,12 +148,7 @@ public class RotaHudEditScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // No-op para evitar o shader de blur do Minecraft cobrindo o editor
-    }
-
-    @Override
-    protected void renderBlurredBackground(float partialTick) {
-        // No-op
+        // No-op para evitar que o ciclo vanilla redesenhe texturas indesejadas
     }
 
     @Override
@@ -168,15 +163,18 @@ public class RotaHudEditScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // 1. Fundo escurecido semi-transparente limpo sem blur
-        graphics.fill(0, 0, this.width, this.height, 0x88000000);
+        // 1. Aciona o blur de pos-processamento do Minecraft estritamente no fundo do cenario
+        this.renderBlurredBackground(partialTick);
 
-        // 2. Guias magnéticas sutis ao arrastar
+        // 2. Aplica veu escuro translucido limpo por cima do blur
+        graphics.fill(0, 0, this.width, this.height, 0x77000000);
+
+        // 3. Guias magnéticas sutis ao arrastar
         if (activeDragged != null) {
             renderMagneticGuides(graphics);
         }
 
-        // 3. Caixas delimitadoras de cada HUD
+        // 4. Caixas delimitadoras de cada HUD
         for (HudEditItem item : items) {
             boolean isDragged = (item == activeDragged);
             boolean isHovered = !isDragged && item.contains(mouseX, mouseY);
@@ -204,7 +202,7 @@ public class RotaHudEditScreen extends Screen {
             graphics.drawCenteredString(this.font, statusStr, item.x + item.width / 2, titleY + 11, RotaTheme.TEXT_MUTED);
         }
 
-        // 4. Cabeçalho explicativo
+        // 5. Cabeçalho explicativo
         graphics.drawCenteredString(this.font, "§6§lEDITOR DE POSICIONAMENTO DE HUDS", this.width / 2, 12, RotaTheme.TEXT_TITLE);
         graphics.drawCenteredString(this.font, "§7Clique e arraste as caixas com o mouse. Encaixe magnético ativo nos cantos e centros.", this.width / 2, 24, RotaTheme.TEXT_MUTED);
 
