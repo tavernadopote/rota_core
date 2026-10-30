@@ -27,6 +27,7 @@ public class RotaCategoryScreen extends Screen {
     private RotaConfigListWidget listWidget;
     private EditBox searchBox;
     private RotaConfigOption focusedOption;
+    private double inspectorScrollAmount = 0.0;
 
     public RotaCategoryScreen(Screen parentHub, RotaCategory category) {
         this(parentHub, category, null);
@@ -43,15 +44,42 @@ public class RotaCategoryScreen extends Screen {
         return parentHub;
     }
 
+    public RotaConfigOption getFocusedOption() {
+        return this.focusedOption;
+    }
+
+    public double getInspectorScrollAmount() {
+        return this.inspectorScrollAmount;
+    }
+
+    public void setInspectorScrollAmount(double scrollAmount) {
+        this.inspectorScrollAmount = Math.max(0.0, scrollAmount);
+    }
+
     public void setFocusedOption(RotaConfigOption option) {
         if (option != null && option.getType() != RotaConfigOption.Type.HEADER) {
+            if (this.focusedOption != option) {
+                this.inspectorScrollAmount = 0.0;
+            }
             this.focusedOption = option;
         }
     }
 
+    public static double calculateMaxScroll(int totalContentHeight, int visibleHeight) {
+        return Math.max(0.0, totalContentHeight - visibleHeight);
+    }
+
+    public static double clampScroll(double scrollAmount, double maxScroll) {
+        return Math.max(0.0, Math.min(maxScroll, scrollAmount));
+    }
+
+    public static double applyScrollDelta(double currentScroll, double scrollY, double maxScroll) {
+        return Math.max(0.0, Math.min(maxScroll, currentScroll - scrollY * 16.0));
+    }
+
     @Override
     protected void init() {
-        int listWidth = (int) (this.width * 0.67);
+        int listWidth = (int) (this.width * 0.65);
         int topY = 36;
         int bottomHeight = 36;
         int listHeight = this.height - topY - bottomHeight;
@@ -65,6 +93,7 @@ public class RotaCategoryScreen extends Screen {
             for (RotaConfigOption opt : options) {
                 if (opt.getType() != RotaConfigOption.Type.HEADER) {
                     this.focusedOption = opt;
+                    this.inspectorScrollAmount = 0.0;
                     break;
                 }
             }
@@ -95,7 +124,7 @@ public class RotaCategoryScreen extends Screen {
 
         // 5. Caixa de Busca no Rodapé Direito (Abaixo do Painel Inspector)
         int inspectorX = listWidth + 8;
-        int inspectorWidth = this.width - inspectorX - 12;
+        int inspectorWidth = this.width - inspectorX - 10;
 
         this.searchBox = new EditBox(this.font, inspectorX, this.height - 28, inspectorWidth, 20, Component.literal("Buscar..."));
         this.searchBox.setHint(Component.literal("§8Buscar opção..."));
@@ -136,16 +165,119 @@ public class RotaCategoryScreen extends Screen {
         renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY, mouseX, mouseY);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        int listWidth = (int) (this.width * 0.65);
+        int inspectorX = listWidth + 8;
+        int topY = 36;
+        int bottomY = this.height - 36;
+        int inspectorWidth = this.width - inspectorX - 10;
+        int inspectorHeight = bottomY - topY;
+
+        if (mouseX >= inspectorX && mouseX <= inspectorX + inspectorWidth && mouseY >= topY && mouseY <= bottomY) {
+            if (this.focusedOption != null) {
+                int innerWidth = inspectorWidth - 24;
+                int totalContentHeight = calculateInspectorContentHeight(this.focusedOption, innerWidth);
+                int visibleHeight = inspectorHeight - 20;
+                double maxScroll = calculateMaxScroll(totalContentHeight, visibleHeight);
+                if (maxScroll > 0) {
+                    this.inspectorScrollAmount = applyScrollDelta(this.inspectorScrollAmount, scrollY, maxScroll);
+                    return true;
+                }
+            }
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    public int calculateInspectorContentHeight(RotaConfigOption option, int innerWidth) {
+        if (option == null) {
+            return 0;
+        }
+        int total = 0;
+
+        // Título e espaçamento
+        int titleLinesCount = (this.font != null)
+                ? this.font.split(Component.literal("§6§l" + option.getTitle().getString()), innerWidth).size()
+                : 1;
+        total += titleLinesCount * 12 + 10;
+
+        // Bloqueio de servidor (se houver)
+        boolean canEdit = option.canPlayerEdit(this.minecraft);
+        if (!canEdit) {
+            total += 20;
+        }
+
+        // Descrição
+        String desc = option.getDescription();
+        if (desc != null && !desc.isEmpty()) {
+            int descLinesCount = (this.font != null)
+                    ? this.font.split(Component.literal("§f" + desc), innerWidth).size()
+                    : Math.max(1, (int) Math.ceil((double) desc.length() * 6 / Math.max(1, innerWidth)));
+            total += descLinesCount * 11 + 8;
+        }
+
+        // Dicas / Exemplos
+        String tip = option.getExampleTip();
+        if (tip != null && !tip.isEmpty()) {
+            int tipLinesCount = (this.font != null)
+                    ? this.font.split(Component.literal("§b" + tip), innerWidth).size()
+                    : Math.max(1, (int) Math.ceil((double) tip.length() * 6 / Math.max(1, innerWidth)));
+            total += tipLinesCount * 11 + 24;
+        }
+
+        // Padrão recomendado
+        String defaultVal = option.getDefaultValueText();
+        if (defaultVal != null && !defaultVal.isEmpty()) {
+            String fullDefault = "§7Padrão recomendado: §a" + defaultVal;
+            int defLinesCount = (this.font != null)
+                    ? this.font.split(Component.literal(fullDefault), innerWidth).size()
+                    : 1;
+            total += defLinesCount * 11 + 8;
+        }
+
+        // Card de textura
+        if (option.hasTexturePreview()) {
+            int pad = 4;
+            int optW = option.getTexturePreviewWidth();
+            int optH = option.getTexturePreviewHeight();
+            int maxPreviewW = Math.max(16, innerWidth - pad * 2);
+            int previewH = optH;
+            if (optW > maxPreviewW) {
+                float scale = (float) maxPreviewW / (float) optW;
+                previewH = Math.max(16, (int) (optH * scale));
+            }
+            boolean hasCaption = option.getTexturePreviewCaption() != null;
+            int fontHeight = (this.font != null) ? this.font.lineHeight : 9;
+            int captionSpacing = hasCaption ? (4 + fontHeight) : 0;
+            int cardH = pad + previewH + pad + captionSpacing;
+            total += cardH + 16;
+        }
+
+        // Galeria de ícones
+        if (option.hasIconPreviews()) {
+            int slotSize = 22;
+            int gap = 3;
+            int cols = Math.max(1, (innerWidth + gap) / (slotSize + gap));
+            int count = option.getIconPreviews().size();
+            int rows = (count + cols - 1) / cols;
+            int gridHeight = rows * (slotSize + gap);
+            total += gridHeight + 25;
+        }
+
+        return total;
+    }
+
     private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height, int mouseX, int mouseY) {
-        // Fundo escuro com borda suave
+        // Fundo escuro com borda suave na caixa completa
         graphics.fill(x, y, x + width, y + height, 0xCC111111);
         graphics.renderOutline(x, y, width, height, 0xFF555555);
 
         int innerX = x + 12;
-        int innerY = y + 10;
         int innerWidth = width - 24;
 
         if (focusedOption == null) {
+            int innerY = y + 10;
             graphics.drawString(this.font, "§6Ajuda & Descrição", innerX, innerY, 0xFFFFAA00, false);
             graphics.fill(innerX, innerY + 12, innerX + innerWidth, innerY + 13, 0xFF444444);
             List<FormattedCharSequence> lines = this.font.split(
@@ -160,12 +292,21 @@ public class RotaCategoryScreen extends Screen {
             return;
         }
 
+        int totalContentHeight = calculateInspectorContentHeight(focusedOption, innerWidth);
+        int visibleHeight = height - 20;
+        double maxScroll = calculateMaxScroll(totalContentHeight, visibleHeight);
+        this.inspectorScrollAmount = clampScroll(this.inspectorScrollAmount, maxScroll);
+
+        // Ativa o Scissor para confinar estritamente o conteúdo dentro do painel
+        graphics.enableScissor(x + 1, y + 1, x + width - 1, y + height - 1);
+
+        int curY = y + 10 - (int) this.inspectorScrollAmount;
+
         // Título da Opção em Destaque (com quebra se for longo)
         List<FormattedCharSequence> titleLines = this.font.split(
                 Component.literal("§6§l" + focusedOption.getTitle().getString()),
                 innerWidth
         );
-        int curY = innerY;
         for (FormattedCharSequence tLine : titleLines) {
             graphics.drawString(this.font, tLine, innerX, curY, 0xFFFFAA00, false);
             curY += 12;
@@ -252,7 +393,8 @@ public class RotaCategoryScreen extends Screen {
             int cardY = textY;
 
             boolean hasCaption = focusedOption.getTexturePreviewCaption() != null;
-            int captionSpacing = hasCaption ? (4 + this.font.lineHeight) : 0;
+            int fontHeight = (this.font != null) ? this.font.lineHeight : 9;
+            int captionSpacing = hasCaption ? (4 + fontHeight) : 0;
             int cardH = pad + previewH + pad + captionSpacing;
 
             // Moldura escura e contorno elegante
@@ -292,7 +434,8 @@ public class RotaCategoryScreen extends Screen {
             textY = cardY + cardH + 2;
         }
 
-        // Galeria de Pre-visualizacao de Icones (quando a opcao fornece previews)
+        // Galeria de Pre-visualizacao de Icones
+        com.rotacore.config.RotaIconPreview hoveredPreview = null;
         if (focusedOption.hasIconPreviews()) {
             java.util.List<com.rotacore.config.RotaIconPreview> previews = focusedOption.getIconPreviews();
             textY += 6;
@@ -305,9 +448,6 @@ public class RotaCategoryScreen extends Screen {
             int slotSize = 22;
             int gap = 3;
             int cols = Math.max(1, (innerWidth + gap) / (slotSize + gap));
-            int maxY = y + height - 8;
-
-            com.rotacore.config.RotaIconPreview hoveredPreview = null;
 
             for (int i = 0; i < previews.size(); i++) {
                 int col = i % cols;
@@ -315,11 +455,8 @@ public class RotaCategoryScreen extends Screen {
                 int slotX = innerX + col * (slotSize + gap);
                 int slotY = textY + row * (slotSize + gap);
 
-                if (slotY + slotSize > maxY) {
-                    break;
-                }
-
-                boolean isHovered = mouseX >= slotX && mouseX < slotX + slotSize && mouseY >= slotY && mouseY < slotY + slotSize;
+                boolean isHovered = mouseX >= slotX && mouseX < slotX + slotSize && mouseY >= slotY && mouseY < slotY + slotSize
+                        && mouseY >= (y + 1) && mouseY <= (y + height - 1);
 
                 // Fundo e contorno do slot
                 graphics.fill(slotX, slotY, slotX + slotSize, slotY + slotSize, 0xEE1E1E1E);
@@ -336,10 +473,23 @@ public class RotaCategoryScreen extends Screen {
                     hoveredPreview = prev;
                 }
             }
+        }
 
-            if (hoveredPreview != null && hoveredPreview.label() != null && !hoveredPreview.label().getString().isEmpty()) {
-                graphics.renderTooltip(this.font, hoveredPreview.label(), mouseX, mouseY);
-            }
+        // Desativa o Scissor
+        graphics.disableScissor();
+
+        // Barra de Rolagem Visual
+        if (maxScroll > 0) {
+            int barX = x + width - 5;
+            int trackH = height - 4;
+            int thumbH = Math.max(16, (int) ((float) visibleHeight / (float) totalContentHeight * trackH));
+            int thumbY = y + 2 + (int) ((float) this.inspectorScrollAmount / (float) maxScroll * (trackH - thumbH));
+            graphics.fill(barX, y + 2, barX + 3, y + 2 + trackH, 0x44000000);
+            graphics.fill(barX, thumbY, barX + 3, thumbY + thumbH, 0xFFAAAAAA);
+        }
+
+        if (hoveredPreview != null && hoveredPreview.label() != null && !hoveredPreview.label().getString().isEmpty()) {
+            graphics.renderTooltip(this.font, hoveredPreview.label(), mouseX, mouseY);
         }
     }
 
