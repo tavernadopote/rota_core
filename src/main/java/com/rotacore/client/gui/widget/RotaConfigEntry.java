@@ -115,6 +115,11 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 // Header não possui controle interativo
             }
         }
+
+        Minecraft mc = Minecraft.getInstance();
+        if (this.controlWidget != null && !option.canPlayerEdit(mc)) {
+            this.controlWidget.active = false;
+        }
     }
 
     public RotaConfigOption getOption() {
@@ -134,6 +139,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
     @Override
     public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isHovered, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
+        boolean canEdit = option.canPlayerEdit(mc);
 
         // Notifica o painel lateral quando o mouse estiver sobre o item
         if (isHovered && option.getType() != RotaConfigOption.Type.HEADER) {
@@ -157,19 +163,40 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
         int textY = top + (height - 9) / 2;
         int maxTextWidth = width - 140;
         String titleStr = option.getTitle().getString();
+        if (!canEdit) {
+            titleStr = "§8[Bloqueado] §7" + titleStr;
+        }
         if (mc.font.width(titleStr) > maxTextWidth) {
             titleStr = mc.font.plainSubstrByWidth(titleStr, maxTextWidth - 8) + "...";
         }
-        graphics.drawString(mc.font, titleStr, left + 6, textY, isHovered ? 0xFFFFFFFF : 0xFFDDDDDD, false);
+        int titleColor = !canEdit ? 0xFF888888 : (isHovered ? 0xFFFFFFFF : 0xFFDDDDDD);
+        graphics.drawString(mc.font, titleStr, left + 6, textY, titleColor, false);
 
         // Renderiza o controle posicionado à direita
         int controlX = left + width - 130;
         int controlY = top + (height - 20) / 2;
 
         if (controlWidget != null) {
+            controlWidget.active = canEdit;
             controlWidget.setX(controlX);
             controlWidget.setY(controlY);
             controlWidget.render(graphics, mouseX, mouseY, partialTick);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!option.canPlayerEdit(Minecraft.getInstance())) {
+            return false;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!option.canPlayerEdit(Minecraft.getInstance())) {
+            return false;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

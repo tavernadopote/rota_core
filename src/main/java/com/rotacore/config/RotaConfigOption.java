@@ -1,5 +1,6 @@
 package com.rotacore.config;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.*;
@@ -47,6 +48,9 @@ public class RotaConfigOption {
     private String actionButtonText;
 
     private java.util.List<RotaIconPreview> iconPreviews = java.util.List.of();
+
+    private boolean requiresAdmin = false;
+    private boolean clientOnly = false;
 
     private RotaConfigOption(Type type, Component title, String description, String exampleTip, String defaultValueText) {
         this.type = type;
@@ -218,5 +222,46 @@ public class RotaConfigOption {
 
     public boolean hasIconPreviews() {
         return iconPreviews != null && !iconPreviews.isEmpty();
+    }
+
+    public RotaConfigOption requiresAdmin(boolean requiresAdmin) {
+        this.requiresAdmin = requiresAdmin;
+        return this;
+    }
+
+    public boolean requiresAdmin() {
+        return requiresAdmin;
+    }
+
+    public RotaConfigOption clientOnly(boolean clientOnly) {
+        this.clientOnly = clientOnly;
+        return this;
+    }
+
+    public boolean isClientOnly() {
+        return clientOnly;
+    }
+
+    public boolean clientOnly() {
+        return clientOnly;
+    }
+
+    public boolean canPlayerEdit(Minecraft mc) {
+        if (mc == null) {
+            return true;
+        }
+        boolean isSingleplayer = mc.getSingleplayerServer() != null;
+        boolean hasAdmin = mc.player != null && mc.player.hasPermissions(2);
+        return canPlayerEdit(isSingleplayer, hasAdmin);
+    }
+
+    public boolean canPlayerEdit(boolean isSingleplayer, boolean hasAdminPermissions) {
+        if (isSingleplayer) {
+            return true;
+        }
+        if (!requiresAdmin) {
+            return true;
+        }
+        return hasAdminPermissions;
     }
 }

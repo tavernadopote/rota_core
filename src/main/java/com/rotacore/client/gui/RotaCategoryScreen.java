@@ -172,8 +172,17 @@ public class RotaCategoryScreen extends Screen {
         }
         graphics.fill(innerX, curY + 2, innerX + innerWidth, curY + 3, 0xFF555555);
 
-        // Descrição Detalhada com Quebra Automática de Linha
+        // Aviso de Bloqueio por Servidor se o jogador não puder editar
+        boolean canEdit = focusedOption.canPlayerEdit(this.minecraft);
         int textY = curY + 8;
+        if (!canEdit) {
+            graphics.fill(innerX - 2, textY - 2, innerX + innerWidth + 2, textY + 14, 0x44CC2222);
+            graphics.renderOutline(innerX - 2, textY - 2, innerWidth + 4, 16, 0xFFAA3333);
+            graphics.drawString(this.font, "§c[Bloqueado pelo Servidor - Requer Admin]", innerX + 2, textY + 2, 0xFFFF5555, false);
+            textY += 20;
+        }
+
+        // Descrição Detalhada com Quebra Automática de Linha
         String desc = focusedOption.getDescription();
         if (desc != null && !desc.isEmpty()) {
             List<FormattedCharSequence> descLines = this.font.split(

@@ -18,6 +18,7 @@ Desenvolvida especialmente para **Minecraft 1.21.1 (NeoForge)**, ela substitui b
 - **Gerenciador Central de HUD e Editor Sandbox**: Barramento unificado para registro de elementos na tela com layout automático, empilhamento anti-colisão inteligente e editor interativo de arrastar e soltar (drag & drop).
 - **Sistema de Nomes de Vilas por DataPacks e i18n**: Resolução determinística e multilíngue de nomes de assentamentos com hierarquia tripla de prioridade (Waystones, DataPacks e Procedural Nativo).
 - **Vocação Comercial de Assentamentos (`SettlementCommercialData`)**: Análise de postos de trabalho de aldeões e geração de perfis econômicos para mapas e interfaces.
+- **Governança de Configurações (Cliente vs Servidor / Admin)**: Separação formal entre preferências cosméticas do cliente e opções de impacto no mundo, com travas de segurança e desativação visual automática para jogadores sem privilégio de operador em servidores multiplayer.
 - **Leveza Extrema**: Arquivo jar super otimizado de altíssima performance.
 
 ---
