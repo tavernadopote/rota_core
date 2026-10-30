@@ -197,6 +197,67 @@ public class RotaCategoryScreen extends Screen {
 
         textY += 8;
 
+        // Card de Pré-visualização de Textura (ex: relevo hipsométrico de temas)
+        if (focusedOption.hasTexturePreview()) {
+            int pad = 4;
+            int optW = focusedOption.getTexturePreviewWidth();
+            int optH = focusedOption.getTexturePreviewHeight();
+
+            // Ajusta dimensões da pré-visualização respeitando a largura útil do Inspector
+            int maxPreviewW = Math.max(16, innerWidth - pad * 2);
+            int previewW = optW;
+            int previewH = optH;
+            if (previewW > maxPreviewW) {
+                float scale = (float) maxPreviewW / (float) previewW;
+                previewW = maxPreviewW;
+                previewH = Math.max(16, (int) (optH * scale));
+            }
+
+            int cardW = previewW + pad * 2;
+            int cardX = innerX + Math.max(0, (innerWidth - cardW) / 2);
+            int cardY = textY;
+
+            boolean hasCaption = focusedOption.getTexturePreviewCaption() != null;
+            int captionSpacing = hasCaption ? (4 + this.font.lineHeight) : 0;
+            int cardH = pad + previewH + pad + captionSpacing;
+
+            // Moldura escura e contorno elegante
+            graphics.fill(cardX, cardY, cardX + cardW, cardY + cardH, 0xFF0A0C10);
+            graphics.renderOutline(cardX, cardY, cardW, cardH, 0xFF444444);
+
+            // Renderização da textura gráfica
+            try {
+                graphics.blit(
+                        focusedOption.getTexturePreviewLocation(),
+                        cardX + pad,
+                        cardY + pad,
+                        previewW,
+                        previewH,
+                        0.0f,
+                        0.0f,
+                        optW,
+                        optH,
+                        optW,
+                        optH
+                );
+            } catch (Throwable ignored) {
+            }
+
+            // Legenda centralizada abaixo da imagem
+            if (hasCaption) {
+                int captionY = cardY + pad + previewH + 4;
+                graphics.drawCenteredString(
+                        this.font,
+                        focusedOption.getTexturePreviewCaption(),
+                        cardX + cardW / 2,
+                        captionY,
+                        0xFFAAAAAA
+                );
+            }
+
+            textY = cardY + cardH + 8;
+        }
+
         // Bloco de Dicas / Exemplos Práticos
         if (focusedOption.getExampleTip() != null && !focusedOption.getExampleTip().isEmpty()) {
             graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);

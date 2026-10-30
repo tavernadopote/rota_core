@@ -112,4 +112,47 @@ public class RotaConfigOptionTest {
         // Fallback seguro quando Minecraft instance for nula
         assertTrue(adminOpt.canPlayerEdit((net.minecraft.client.Minecraft) null));
     }
+
+    @Test
+    public void testTexturePreview() {
+        ResourceLocation themeTexture = ResourceLocation.fromNamespaceAndPath("rota_map", "textures/gui/preview/theme_satellite.png");
+        Component caption = Component.literal("Perfil Geográfico Sintético");
+
+        RotaConfigOption opt = RotaConfigOption.action(
+                Component.literal("Tema Satélite"),
+                "Descrição do tema",
+                "Dica do tema",
+                "Selecionar",
+                () -> {}
+        );
+
+        assertFalse(opt.hasTexturePreview());
+        assertNull(opt.getTexturePreviewLocation());
+        assertEquals(128, opt.getTexturePreviewWidth());
+        assertEquals(128, opt.getTexturePreviewHeight());
+        assertNull(opt.getTexturePreviewCaption());
+
+        RotaConfigOption returnedOpt = opt.withTexturePreview(themeTexture, 128, 128, caption);
+        assertSame(opt, returnedOpt);
+        assertTrue(opt.hasTexturePreview());
+        assertEquals(themeTexture, opt.getTexturePreviewLocation());
+        assertEquals(128, opt.getTexturePreviewWidth());
+        assertEquals(128, opt.getTexturePreviewHeight());
+        assertEquals("Perfil Geográfico Sintético", opt.getTexturePreviewCaption().getString());
+
+        // Teste sem legenda
+        RotaConfigOption optWithoutCaption = RotaConfigOption.action(
+                Component.literal("Tema Sem Legenda"),
+                "Descrição",
+                "Dica",
+                "Ativar",
+                () -> {}
+        ).withTexturePreview(themeTexture, 64, 48);
+
+        assertTrue(optWithoutCaption.hasTexturePreview());
+        assertEquals(themeTexture, optWithoutCaption.getTexturePreviewLocation());
+        assertEquals(64, optWithoutCaption.getTexturePreviewWidth());
+        assertEquals(48, optWithoutCaption.getTexturePreviewHeight());
+        assertNull(optWithoutCaption.getTexturePreviewCaption());
+    }
 }

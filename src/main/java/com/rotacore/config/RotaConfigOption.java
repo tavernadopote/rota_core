@@ -2,6 +2,7 @@ package com.rotacore.config;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.*;
 
@@ -48,6 +49,11 @@ public class RotaConfigOption {
     private String actionButtonText;
 
     private java.util.List<RotaIconPreview> iconPreviews = java.util.List.of();
+
+    private ResourceLocation texturePreviewLocation = null;
+    private int texturePreviewWidth = 128;
+    private int texturePreviewHeight = 128;
+    private Component texturePreviewCaption = null;
 
     private boolean requiresAdmin = false;
     private boolean clientOnly = false;
@@ -222,6 +228,38 @@ public class RotaConfigOption {
 
     public boolean hasIconPreviews() {
         return iconPreviews != null && !iconPreviews.isEmpty();
+    }
+
+    public RotaConfigOption withTexturePreview(ResourceLocation texture, int width, int height, Component caption) {
+        this.texturePreviewLocation = texture;
+        this.texturePreviewWidth = width;
+        this.texturePreviewHeight = height;
+        this.texturePreviewCaption = caption;
+        return this;
+    }
+
+    public RotaConfigOption withTexturePreview(ResourceLocation texture, int width, int height) {
+        return withTexturePreview(texture, width, height, null);
+    }
+
+    public boolean hasTexturePreview() {
+        return texturePreviewLocation != null;
+    }
+
+    public ResourceLocation getTexturePreviewLocation() {
+        return texturePreviewLocation;
+    }
+
+    public int getTexturePreviewWidth() {
+        return texturePreviewWidth;
+    }
+
+    public int getTexturePreviewHeight() {
+        return texturePreviewHeight;
+    }
+
+    public Component getTexturePreviewCaption() {
+        return texturePreviewCaption;
     }
 
     public RotaConfigOption requiresAdmin(boolean requiresAdmin) {

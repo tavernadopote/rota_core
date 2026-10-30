@@ -1,3 +1,10 @@
+# Version v1.9.0 - Texture Preview Inspector Cards & Dynamic Customization
+
+## Overview
+Version **v1.9.0** extends the configuration framework with texture preview cards (`withTexturePreview`), allowing options such as visual cartographic themes and presets to display live synthetic relief or texture graphics directly inside the Inspector panel (`RotaCategoryScreen`).
+
+---
+
 # Version v1.6.0 - Centralized HUD API, Anti-Collision Layout & Sandbox Editor
 
 ## Overview
