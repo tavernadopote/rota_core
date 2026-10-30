@@ -1,3 +1,10 @@
+# Version v1.10.0 - Inspector Preview Ordering & Canonical Alignment
+
+## Overview
+Version **v1.10.0** refines the vertical rendering hierarchy in the Inspector panel of `RotaCategoryScreen`, positioning texture preview cards beneath option descriptions, contextual tips, and default values. This standardizes the visual layout across all module screens in alignment with icon pack galleries.
+
+---
+
 # Version v1.9.0 - Texture Preview Inspector Cards & Dynamic Customization
 
 ## Overview
