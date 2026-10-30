@@ -1,6 +1,7 @@
 {
   "key.categories.rota_core": "Rota Mods",
   "key.rota_core.open_hub": "Abrir Painel Rota Mods",
+  "key.rota_core.open_hud_editor": "Personalizar Posicionamento dos HUDs",
   "gui.rota_core.hub_title": "Rota Mods — Painel Central",
   "gui.rota_core.no_modules": "Nenhum módulo da Rota Mods encontrado.",
   "gui.rota_core.close": "Fechar",
@@ -8,5 +9,15 @@
   "gui.rota_core.reset": "Restaurar Padrões",
   "gui.rota_core.back": "Voltar",
   "gui.rota_core.module_version": "Versão: %s",
-  "gui.rota_core.tab_dashboard": "Visão Geral"
+  "gui.rota_core.tab_dashboard": "Visão Geral",
+  "gui.rota_core.anchor.top_left": "Superior Esquerdo",
+  "gui.rota_core.anchor.top_center": "Superior Central",
+  "gui.rota_core.anchor.top_right": "Superior Direito",
+  "gui.rota_core.anchor.middle_left": "Centro Esquerdo",
+  "gui.rota_core.anchor.center": "Centro",
+  "gui.rota_core.anchor.middle_right": "Centro Direito",
+  "gui.rota_core.anchor.bottom_left": "Inferior Esquerdo",
+  "gui.rota_core.anchor.bottom_center": "Inferior Central",
+  "gui.rota_core.anchor.bottom_right": "Inferior Direito",
+  "gui.rota_core.anchor.custom": "Personalizado"
 }

@@ -16,7 +16,10 @@ import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import com.rotacore.client.gui.hud.RotaHudEditScreen;
+import com.rotacore.client.gui.hud.RotaHudLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,5 +159,14 @@ public class RotaClientEvents {
         while (RotaKeyBindings.OPEN_HUB.consumeClick()) {
             mc.setScreen(new RotaCoreModulesScreen(mc.screen));
         }
+        while (RotaKeyBindings.OPEN_HUD_EDITOR.consumeClick()) {
+            mc.setScreen(new RotaHudEditScreen(mc.screen));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRenderGui(RenderGuiEvent.Post event) {
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        RotaHudLayoutManager.renderAll(event.getGuiGraphics(), partialTick);
     }
 }

@@ -1,3 +1,10 @@
+# Version v1.6.0 - Centralized HUD API, Anti-Collision Layout & Sandbox Editor
+
+## Overview
+Version **v1.6.0** introduces the **Universal HUD Framework** (`com.rotacore.client.gui.hud`), providing region-based anchor layouts, automatic anti-collision stacking, circular scanlines, and an interactive mouse-driven sandbox editor (`RotaHudEditScreen`) with persistent coordinates.
+
+---
+
 # Version v1.2.0 - Settlement Cadastral Zoning & Boundary Models
 
 ## Overview

@@ -70,9 +70,69 @@ public class RotaCoreConfig {
      */
     public int maxVillageHeightVariance = 8;
 
+    // =========================================================================
+    // Gerenciamento de HUDs e Posicionamento Sandbox
+    // =========================================================================
+
+    public static class HudElementConfig {
+        public boolean customPosition = false;
+        public int customX = 0;
+        public int customY = 0;
+        public String anchor = "DEFAULT";
+        public boolean visible = true;
+
+        public HudElementConfig() {}
+
+        public HudElementConfig(boolean customPosition, int customX, int customY) {
+            this.customPosition = customPosition;
+            this.customX = customX;
+            this.customY = customY;
+        }
+    }
+
+    public Map<String, HudElementConfig> hudElements = new LinkedHashMap<>();
+
+    public HudElementConfig getHudElementConfig(String id) {
+        if (id == null) return new HudElementConfig();
+        if (hudElements == null) {
+            hudElements = new LinkedHashMap<>();
+        }
+        return hudElements.computeIfAbsent(id, k -> new HudElementConfig());
+    }
+
+    public void setHudElementPosition(String id, int x, int y) {
+        if (id == null) return;
+        HudElementConfig cfg = getHudElementConfig(id);
+        cfg.customPosition = true;
+        cfg.customX = x;
+        cfg.customY = y;
+    }
+
+    public void resetHudElementPosition(String id) {
+        if (id == null) return;
+        HudElementConfig cfg = getHudElementConfig(id);
+        cfg.customPosition = false;
+        cfg.customX = 0;
+        cfg.customY = 0;
+    }
+
+    public void resetAllHudPositions() {
+        if (hudElements != null) {
+            hudElements.clear();
+        }
+    }
+
     public void validate() {
         if (moduleOptionsEnabled == null) {
             moduleOptionsEnabled = new LinkedHashMap<>();
+        }
+        if (hudElements == null) {
+            hudElements = new LinkedHashMap<>();
+        }
+        for (Map.Entry<String, HudElementConfig> entry : hudElements.entrySet()) {
+            if (entry.getValue() == null) {
+                entry.setValue(new HudElementConfig());
+            }
         }
         if (regionalCellSizeChunks < 24) regionalCellSizeChunks = 24;
         if (regionalCellSizeChunks > 128) regionalCellSizeChunks = 128;
