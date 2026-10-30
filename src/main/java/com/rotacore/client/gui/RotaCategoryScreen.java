@@ -197,8 +197,42 @@ public class RotaCategoryScreen extends Screen {
 
         textY += 8;
 
-        // Card de Pré-visualização de Textura (ex: relevo hipsométrico de temas)
+        // Bloco de Dicas / Exemplos Práticos
+        if (focusedOption.getExampleTip() != null && !focusedOption.getExampleTip().isEmpty()) {
+            graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
+            textY += 4;
+            graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
+            textY += 12;
+
+            List<FormattedCharSequence> tipLines = this.font.split(
+                    Component.literal("§b" + focusedOption.getExampleTip()),
+                    innerWidth
+            );
+            for (FormattedCharSequence line : tipLines) {
+                graphics.drawString(this.font, line, innerX, textY, 0xFF88DDFF, false);
+                textY += 11;
+            }
+            textY += 8;
+        }
+
+        // Valor Padrão (com quebra para não vazar da caixa)
+        if (focusedOption.getDefaultValueText() != null && !focusedOption.getDefaultValueText().isEmpty()) {
+            List<FormattedCharSequence> defaultLines = this.font.split(
+                    Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
+                    innerWidth
+            );
+            for (FormattedCharSequence line : defaultLines) {
+                graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
+                textY += 11;
+            }
+        }
+
+        // Card de Pré-visualização de Textura do Mapa (ex: relevo hipsométrico de temas)
         if (focusedOption.hasTexturePreview()) {
+            textY += 6;
+            graphics.fill(innerX, textY, innerX + innerWidth, textY + 1, 0xFF444444);
+            textY += 8;
+
             int pad = 4;
             int optW = focusedOption.getTexturePreviewWidth();
             int optH = focusedOption.getTexturePreviewHeight();
@@ -255,37 +289,7 @@ public class RotaCategoryScreen extends Screen {
                 );
             }
 
-            textY = cardY + cardH + 8;
-        }
-
-        // Bloco de Dicas / Exemplos Práticos
-        if (focusedOption.getExampleTip() != null && !focusedOption.getExampleTip().isEmpty()) {
-            graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
-            textY += 4;
-            graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
-            textY += 12;
-
-            List<FormattedCharSequence> tipLines = this.font.split(
-                    Component.literal("§b" + focusedOption.getExampleTip()),
-                    innerWidth
-            );
-            for (FormattedCharSequence line : tipLines) {
-                graphics.drawString(this.font, line, innerX, textY, 0xFF88DDFF, false);
-                textY += 11;
-            }
-            textY += 8;
-        }
-
-        // Valor Padrão (com quebra para não vazar da caixa)
-        if (focusedOption.getDefaultValueText() != null && !focusedOption.getDefaultValueText().isEmpty()) {
-            List<FormattedCharSequence> defaultLines = this.font.split(
-                    Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
-                    innerWidth
-            );
-            for (FormattedCharSequence line : defaultLines) {
-                graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
-                textY += 11;
-            }
+            textY = cardY + cardH + 2;
         }
 
         // Galeria de Pre-visualizacao de Icones (quando a opcao fornece previews)
