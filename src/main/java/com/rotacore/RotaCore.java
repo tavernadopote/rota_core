@@ -3,11 +3,13 @@ package com.rotacore;
 import com.rotacore.client.RotaCoreClient;
 import com.rotacore.config.RotaConfigHandler;
 import com.rotacore.config.RotaCoreConfig;
+import com.rotacore.world.names.VillageNameDataLoader;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,10 @@ public class RotaCore {
     );
 
     public RotaCore(IEventBus modEventBus, ModContainer modContainer) {
-        LOGGER.info("{} v1.0.0 inicializado com sucesso no NeoForge.", MOD_NAME);
+        LOGGER.info("{} inicializado com sucesso no NeoForge.", MOD_NAME);
+
+        // Registra o recarregador de DataPacks de nomes de vilas no barramento de eventos do NeoForge
+        NeoForge.EVENT_BUS.addListener(VillageNameDataLoader::onAddReloadListeners);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             RotaCoreClient.registerClient(modEventBus, modContainer);

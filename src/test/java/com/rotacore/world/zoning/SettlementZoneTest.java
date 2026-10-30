@@ -1,11 +1,13 @@
 package com.rotacore.world.zoning;
 
+import com.rotacore.world.names.SettlementCommercialData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,7 +116,8 @@ public class SettlementZoneTest {
         List<SettlementBounds> pieces = List.of(new SettlementBounds(25, 60, 25, 35, 70, 35));
         List<BlockPos> endpoints = List.of(new BlockPos(18, 64, 30));
 
-        SettlementZone original = new SettlementZone(structural, urbanCore, approach, pieces, endpoints);
+        SettlementCommercialData commData = new SettlementCommercialData("Agropecuária", "", List.of("Pão", "Trigo"), Map.of());
+        SettlementZone original = new SettlementZone(structural, urbanCore, approach, pieces, endpoints, "Vila Verde", commData);
         CompoundTag tag = original.save();
         assertNotNull(tag);
 
@@ -126,5 +129,8 @@ public class SettlementZoneTest {
         assertEquals(1, loaded.getPieces().size());
         assertEquals(1, loaded.getStreetEndpoints().size());
         assertEquals(18, loaded.getStreetEndpoints().get(0).getX());
+        assertEquals("Vila Verde", loaded.getSettlementName());
+        assertNotNull(loaded.getCommercialData());
+        assertEquals("Agropecuária", loaded.getCommercialData().getPrimaryVocation());
     }
 }

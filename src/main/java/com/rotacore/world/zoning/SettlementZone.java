@@ -5,6 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 
+import com.rotacore.world.names.SettlementCommercialData;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +18,8 @@ import java.util.List;
  * 1. structuralBounds (Roxa): Envelope de reserva cadastral total da estrutura no nível macro (minX, maxX, minZ, maxZ).
  * 2. urbanCoreBounds (Verde): Envelope estrito das peças, casas e edificações reais.
  * 3. approachPerimeterBounds (Amarela): Margem justa de aproximação segura para estradas (ex: 8 a 10 blocos ao redor das casas).
- * Também armazena e expõe as peças individuais e a lista de saídas viárias (streetEndpoints).
+ * Também armazena e expõe as peças individuais, a lista de saídas viárias (streetEndpoints),
+ * o nome próprio do vilarejo e a vocação comercial calculada.
  */
 public class SettlementZone {
 
@@ -27,6 +30,26 @@ public class SettlementZone {
     private final SettlementBounds approachPerimeterBounds;
     private final List<SettlementBounds> pieces;
     private final List<BlockPos> streetEndpoints;
+    private String settlementName;
+    private SettlementCommercialData commercialData;
+
+    public SettlementZone(
+            SettlementBounds structuralBounds,
+            SettlementBounds urbanCoreBounds,
+            SettlementBounds approachPerimeterBounds,
+            Collection<SettlementBounds> pieces,
+            Collection<BlockPos> streetEndpoints,
+            String settlementName,
+            SettlementCommercialData commercialData
+    ) {
+        this.structuralBounds = structuralBounds != null ? structuralBounds : new SettlementBounds(0, 0, 0, 0);
+        this.urbanCoreBounds = urbanCoreBounds != null ? urbanCoreBounds : this.structuralBounds;
+        this.approachPerimeterBounds = approachPerimeterBounds != null ? approachPerimeterBounds : this.urbanCoreBounds.expanded(DEFAULT_APPROACH_MARGIN);
+        this.pieces = (pieces != null) ? Collections.unmodifiableList(new ArrayList<>(pieces)) : Collections.emptyList();
+        this.streetEndpoints = (streetEndpoints != null) ? Collections.unmodifiableList(new ArrayList<>(streetEndpoints)) : Collections.emptyList();
+        this.settlementName = settlementName != null ? settlementName : "";
+        this.commercialData = commercialData;
+    }
 
     public SettlementZone(
             SettlementBounds structuralBounds,
@@ -35,11 +58,7 @@ public class SettlementZone {
             Collection<SettlementBounds> pieces,
             Collection<BlockPos> streetEndpoints
     ) {
-        this.structuralBounds = structuralBounds != null ? structuralBounds : new SettlementBounds(0, 0, 0, 0);
-        this.urbanCoreBounds = urbanCoreBounds != null ? urbanCoreBounds : this.structuralBounds;
-        this.approachPerimeterBounds = approachPerimeterBounds != null ? approachPerimeterBounds : this.urbanCoreBounds.expanded(DEFAULT_APPROACH_MARGIN);
-        this.pieces = (pieces != null) ? Collections.unmodifiableList(new ArrayList<>(pieces)) : Collections.emptyList();
-        this.streetEndpoints = (streetEndpoints != null) ? Collections.unmodifiableList(new ArrayList<>(streetEndpoints)) : Collections.emptyList();
+        this(structuralBounds, urbanCoreBounds, approachPerimeterBounds, pieces, streetEndpoints, "", null);
     }
 
     public SettlementBounds getStructuralBounds() {
@@ -60,6 +79,26 @@ public class SettlementZone {
 
     public List<BlockPos> getStreetEndpoints() {
         return streetEndpoints;
+    }
+
+    public String getSettlementName() {
+        return settlementName;
+    }
+
+    public void setSettlementName(String settlementName) {
+        this.settlementName = settlementName != null ? settlementName : "";
+    }
+
+    public boolean hasSettlementName() {
+        return settlementName != null && !settlementName.trim().isEmpty();
+    }
+
+    public SettlementCommercialData getCommercialData() {
+        return commercialData;
+    }
+
+    public void setCommercialData(SettlementCommercialData commercialData) {
+        this.commercialData = commercialData;
     }
 
     public boolean isInsideStructural(int x, int z) {
@@ -243,6 +282,13 @@ public class SettlementZone {
         }
         tag.put("street_endpoints", endpointsList);
 
+        if (settlementName != null && !settlementName.trim().isEmpty()) {
+            tag.putString("settlement_name", settlementName);
+        }
+        if (commercialData != null) {
+            tag.put("commercial_data", commercialData.save());
+        }
+
         return tag;
     }
 
@@ -278,6 +324,11 @@ public class SettlementZone {
             }
         }
 
-        return new SettlementZone(structural, urbanCore, approach, pieces, endpoints);
+        String settlementName = tag.getString("settlement_name");
+        SettlementCommercialData commercialData = tag.contains("commercial_data", Tag.TAG_COMPOUND)
+                ? SettlementCommercialData.load(tag.getCompound("commercial_data"))
+                : null;
+
+        return new SettlementZone(structural, urbanCore, approach, pieces, endpoints, settlementName, commercialData);
     }
 }
