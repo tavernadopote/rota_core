@@ -155,4 +155,46 @@ public class RotaConfigOptionTest {
         assertEquals(48, optWithoutCaption.getTexturePreviewHeight());
         assertNull(optWithoutCaption.getTexturePreviewCaption());
     }
+
+    @Test
+    public void testSecondaryActionFluentAndGetters() {
+        boolean[] actionExecuted = new boolean[]{false};
+        boolean[] secondaryExecuted = new boolean[]{false};
+
+        RotaConfigOption opt = RotaConfigOption.action(
+                Component.literal("Tema Pergaminho"),
+                "Descrição do tema",
+                "Dica do tema",
+                "Usar Tema",
+                () -> actionExecuted[0] = true
+        );
+
+        // Inicialmente sem ação secundária
+        assertFalse(opt.hasSecondaryAction());
+        assertNull(opt.getSecondaryAction());
+        assertNotNull(opt.getSecondaryActionTooltip());
+        assertEquals("Configurar Parâmetros...", opt.getSecondaryActionTooltip().getString());
+
+        // Configuração com ação secundária e tooltip padrão
+        RotaConfigOption returnedOpt = opt.withSecondaryAction(() -> secondaryExecuted[0] = true);
+        assertSame(opt, returnedOpt);
+        assertTrue(opt.hasSecondaryAction());
+        assertNotNull(opt.getSecondaryAction());
+        assertEquals("Configurar Parâmetros...", opt.getSecondaryActionTooltip().getString());
+
+        // Execução da ação secundária
+        opt.getSecondaryAction().run();
+        assertTrue(secondaryExecuted[0]);
+        assertFalse(actionExecuted[0]);
+
+        // Execução da ação principal
+        opt.triggerAction();
+        assertTrue(actionExecuted[0]);
+
+        // Configuração com ação secundária e tooltip customizado
+        Component customTooltip = Component.literal("Personalizar cores e relevo do tema...");
+        opt.withSecondaryAction(() -> {}, customTooltip);
+        assertTrue(opt.hasSecondaryAction());
+        assertEquals("Personalizar cores e relevo do tema...", opt.getSecondaryActionTooltip().getString());
+    }
 }

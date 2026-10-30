@@ -48,6 +48,9 @@ public class RotaConfigOption {
     private Runnable actionCallback;
     private String actionButtonText;
 
+    private Runnable secondaryAction = null;
+    private Component secondaryActionTooltip = Component.literal("Configurar Parâmetros...");
+
     private java.util.List<RotaIconPreview> iconPreviews = java.util.List.of();
 
     private ResourceLocation texturePreviewLocation = null;
@@ -212,6 +215,28 @@ public class RotaConfigOption {
 
     public String getActionButtonText() { return actionButtonText != null ? actionButtonText : "Abrir"; }
     public void triggerAction() { if (actionCallback != null) actionCallback.run(); }
+
+    public RotaConfigOption withSecondaryAction(Runnable action, Component tooltip) {
+        this.secondaryAction = action;
+        this.secondaryActionTooltip = tooltip != null ? tooltip : Component.literal("Configurar Parâmetros...");
+        return this;
+    }
+
+    public RotaConfigOption withSecondaryAction(Runnable action) {
+        return withSecondaryAction(action, Component.literal("Configurar Parâmetros..."));
+    }
+
+    public boolean hasSecondaryAction() {
+        return secondaryAction != null;
+    }
+
+    public Runnable getSecondaryAction() {
+        return secondaryAction;
+    }
+
+    public Component getSecondaryActionTooltip() {
+        return secondaryActionTooltip;
+    }
 
     public RotaConfigOption withIconPreviews(java.util.List<RotaIconPreview> previews) {
         if (previews != null) {
