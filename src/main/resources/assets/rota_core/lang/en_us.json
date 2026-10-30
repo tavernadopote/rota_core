@@ -1,6 +1,7 @@
 {
   "key.categories.rota_core": "Rota Mods",
   "key.rota_core.open_hub": "Open Rota Mods Hub",
+  "key.rota_core.open_hud_editor": "Customize HUD Layout",
   "gui.rota_core.hub_title": "Rota Mods — Central Hub",
   "gui.rota_core.no_modules": "No Rota Mods modules installed.",
   "gui.rota_core.close": "Close",
@@ -8,5 +9,15 @@
   "gui.rota_core.reset": "Reset Defaults",
   "gui.rota_core.back": "Back",
   "gui.rota_core.module_version": "Version: %s",
-  "gui.rota_core.tab_dashboard": "Dashboard"
+  "gui.rota_core.tab_dashboard": "Dashboard",
+  "gui.rota_core.anchor.top_left": "Top Left",
+  "gui.rota_core.anchor.top_center": "Top Center",
+  "gui.rota_core.anchor.top_right": "Top Right",
+  "gui.rota_core.anchor.middle_left": "Middle Left",
+  "gui.rota_core.anchor.center": "Center",
+  "gui.rota_core.anchor.middle_right": "Middle Right",
+  "gui.rota_core.anchor.bottom_left": "Bottom Left",
+  "gui.rota_core.anchor.bottom_center": "Bottom Center",
+  "gui.rota_core.anchor.bottom_right": "Bottom Right",
+  "gui.rota_core.anchor.custom": "Custom"
 }

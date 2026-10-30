@@ -162,6 +162,17 @@ public class RotaCoreModulesScreen extends Screen {
                 graphics.drawString(this.font, line, innerX, textY, RotaTheme.TEXT_BODY, false);
                 textY += 11;
             }
+        } else if ("HUD_EDITOR".equals(focusedItem)) {
+            graphics.drawString(this.font, "§6§lEditor de HUDs", innerX, innerY, RotaTheme.TEXT_TITLE, false);
+            graphics.drawString(this.font, "§8Sandbox Visual & Auto-Layout", innerX, innerY + 12, RotaTheme.TEXT_MUTED, false);
+            graphics.fill(innerX, innerY + 24, innerX + innerWidth, innerY + 25, RotaTheme.BORDER_SECONDARY);
+
+            int textY = innerY + 30;
+            String tipHud = "§fPermite arrastar livremente qualquer elemento de HUD com o mouse pela tela, utilizando encaixe magnético ou posicionamento automático anti-colisão nas âncoras regionais.";
+            for (FormattedCharSequence line : this.font.split(Component.literal(tipHud), innerWidth)) {
+                graphics.drawString(this.font, line, innerX, textY, RotaTheme.TEXT_BODY, false);
+                textY += 11;
+            }
         } else {
             graphics.drawString(this.font, "§6Ajuda & Informações", innerX, innerY, RotaTheme.TEXT_TITLE, false);
             graphics.fill(innerX, innerY + 14, innerX + innerWidth, innerY + 15, RotaTheme.BORDER_SECONDARY);
@@ -213,6 +224,11 @@ public class RotaCoreModulesScreen extends Screen {
             // Entrada global do Hub
             if (filter.isEmpty() || "hub".contains(filter) || "rota".contains(filter)) {
                 this.addEntry(new HubSettingsEntry(screen));
+            }
+
+            // Entrada do Editor de HUDs Sandbox
+            if (filter.isEmpty() || "hud".contains(filter) || "sandbox".contains(filter) || "posicao".contains(filter)) {
+                this.addEntry(new HudEditorEntry(screen));
             }
 
             // Entradas individuais de cada mod
@@ -365,6 +381,59 @@ public class RotaCoreModulesScreen extends Screen {
             toggleSwitch.setX(toggleX);
             toggleSwitch.setY(controlY);
             toggleSwitch.render(graphics, mouseX, mouseY, partialTick);
+        }
+    }
+
+    public static class HudEditorEntry extends ModuleEntry {
+        private final RotaCoreModulesScreen screen;
+        private final List<GuiEventListener> children = new ArrayList<>();
+        private final List<NarratableEntry> narratables = new ArrayList<>();
+        private final RotaButton editButton;
+
+        public HudEditorEntry(RotaCoreModulesScreen screen) {
+            this.screen = screen;
+            this.editButton = new RotaButton(
+                    0, 0, 96, 20, Component.literal("Editar HUDs"),
+                    btn -> {
+                        if (Minecraft.getInstance() != null) {
+                            Minecraft.getInstance().setScreen(new com.rotacore.client.gui.hud.RotaHudEditScreen(screen));
+                        }
+                    }
+            );
+            this.editButton.setAccent(true);
+            this.children.add(editButton);
+            this.narratables.add(editButton);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return children;
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return narratables;
+        }
+
+        @Override
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isHovered, float partialTick) {
+            Minecraft mc = Minecraft.getInstance();
+
+            if (isHovered) {
+                graphics.fill(left, top, left + width - 4, top + height, 0x1EFFFFFF);
+                screen.setFocusedItem("HUD_EDITOR");
+            }
+
+            int textY = top + (height - 18) / 2;
+            graphics.drawString(mc.font, "§6Posicionamento de HUDs (Sandbox)", left + 8, textY, 0xFFFFAA00, false);
+            graphics.drawString(mc.font, "Personalizar coordenadas livres com o mouse", left + 8, textY + 10, RotaTheme.TEXT_MUTED, false);
+
+            int btnX = left + width - 32 - 102;
+            int controlY = top + (height - 20) / 2;
+
+            editButton.setX(btnX);
+            editButton.setY(controlY);
+            editButton.render(graphics, mouseX, mouseY, partialTick);
         }
     }
 }
