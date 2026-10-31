@@ -138,7 +138,7 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc != null && !option.canPlayerEdit(mc)) {
+        if (!option.isActive() || (mc != null && !option.canPlayerEdit(mc))) {
             if (this.controlWidget != null) {
                 this.controlWidget.active = false;
             }

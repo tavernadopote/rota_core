@@ -425,7 +425,21 @@ public class RotaConfigOption {
         return clientOnly;
     }
 
+    private boolean active = true;
+
+    public RotaConfigOption active(boolean active) {
+        this.active = active;
+        return this;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
     public boolean canPlayerEdit(Minecraft mc) {
+        if (!active) {
+            return false;
+        }
         if (mc == null) {
             return true;
         }
@@ -435,6 +449,9 @@ public class RotaConfigOption {
     }
 
     public boolean canPlayerEdit(boolean isSingleplayer, boolean hasAdminPermissions) {
+        if (!active) {
+            return false;
+        }
         if (isSingleplayer) {
             return true;
         }
