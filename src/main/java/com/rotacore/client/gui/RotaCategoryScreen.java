@@ -77,6 +77,31 @@ public class RotaCategoryScreen extends Screen {
         return Math.max(0.0, Math.min(maxScroll, currentScroll - scrollY * 16.0));
     }
 
+    public static boolean shouldRenderTip(RotaConfigOption option) {
+        if (option == null || !option.hasTip()) {
+            return false;
+        }
+        // Prioriza o espaco vertical para que cards de pre-visualizacao de imagem caibam perfeitamente sem scroll
+        if (option.hasTexturePreview() && !option.isTipExplicitlyForced()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean shouldRenderDefaultValue(RotaConfigOption option) {
+        if (option == null) {
+            return false;
+        }
+        if (option.hasTexturePreview()) {
+            return false;
+        }
+        if (!option.shouldShowDefaultValue()) {
+            return false;
+        }
+        String defaultVal = option.getDefaultValueText();
+        return defaultVal != null && !defaultVal.trim().isEmpty() && !defaultVal.equals("—");
+    }
+
     @Override
     protected void init() {
         int listWidth = (int) (this.width * 0.65);
@@ -217,18 +242,18 @@ public class RotaCategoryScreen extends Screen {
             total += descLinesCount * 11 + 8;
         }
 
-        // Dicas / Exemplos
-        String tip = option.getExampleTip();
-        if (tip != null && !tip.isEmpty()) {
+        // Dicas / Exemplos (omitido por padrao quando redundante ou em opcoes com preview)
+        if (shouldRenderTip(option)) {
+            String tip = option.getExampleTip();
             int tipLinesCount = (this.font != null)
                     ? this.font.split(Component.literal("§b" + tip), innerWidth).size()
                     : Math.max(1, (int) Math.ceil((double) tip.length() * 6 / Math.max(1, innerWidth)));
             total += tipLinesCount * 11 + 24;
         }
 
-        // Padrão recomendado
-        String defaultVal = option.getDefaultValueText();
-        if (defaultVal != null && !defaultVal.isEmpty()) {
+        // Padrao recomendado (omitido por padrao quando a opcao ja exibe seu estado nativamente)
+        if (shouldRenderDefaultValue(option)) {
+            String defaultVal = option.getDefaultValueText();
             String fullDefault = "§7Padrão recomendado: §a" + defaultVal;
             int defLinesCount = (this.font != null)
                     ? this.font.split(Component.literal(fullDefault), innerWidth).size()
@@ -338,8 +363,8 @@ public class RotaCategoryScreen extends Screen {
 
         textY += 8;
 
-        // Bloco de Dicas / Exemplos Práticos
-        if (focusedOption.getExampleTip() != null && !focusedOption.getExampleTip().isEmpty()) {
+        // Bloco de Dicas / Exemplos Praticos (renderizado apenas se houver dica customizada relevante)
+        if (shouldRenderTip(focusedOption)) {
             graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
             textY += 4;
             graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
@@ -356,8 +381,8 @@ public class RotaCategoryScreen extends Screen {
             textY += 8;
         }
 
-        // Valor Padrão (com quebra para não vazar da caixa)
-        if (focusedOption.getDefaultValueText() != null && !focusedOption.getDefaultValueText().isEmpty()) {
+        // Valor Padrao (apenas quando expressamente solicitado)
+        if (shouldRenderDefaultValue(focusedOption)) {
             List<FormattedCharSequence> defaultLines = this.font.split(
                     Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
                     innerWidth
@@ -366,6 +391,7 @@ public class RotaCategoryScreen extends Screen {
                 graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
                 textY += 11;
             }
+            textY += 8;
         }
 
         // Card de Pré-visualização de Textura do Mapa (ex: relevo hipsométrico de temas)

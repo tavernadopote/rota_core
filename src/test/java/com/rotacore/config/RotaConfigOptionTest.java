@@ -197,4 +197,130 @@ public class RotaConfigOptionTest {
         assertTrue(opt.hasSecondaryAction());
         assertEquals("Personalizar cores e relevo do tema...", opt.getSecondaryActionTooltip().getString());
     }
+
+    @Test
+    public void testTipGovernanceAndGenericFiltering() {
+        // Opcao sem dica (null ou vazia)
+        RotaConfigOption optNoTip = RotaConfigOption.booleanToggle(
+                Component.literal("Sem Dica"),
+                "Descricao",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertFalse(optNoTip.hasTip());
+        assertFalse(optNoTip.hasCustomTip());
+
+        // Dicas genericas que refraseiam o controle sao filtradas
+        RotaConfigOption optGeneric1 = RotaConfigOption.booleanToggle(
+                Component.literal("Generico 1"),
+                "Descricao",
+                "Ativado: liga recurso. Desativado: desliga recurso.",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertFalse(optGeneric1.hasTip());
+
+        RotaConfigOption optGeneric2 = RotaConfigOption.intSlider(
+                Component.literal("Generico 2"),
+                "Descricao",
+                "Padrao: 3 blocos.",
+                3,
+                1,
+                10,
+                null,
+                () -> 3,
+                v -> {}
+        );
+        assertFalse(optGeneric2.hasTip());
+
+        // Dica explicita relevante do desenvolvedor
+        RotaConfigOption optCustom = RotaConfigOption.booleanToggle(
+                Component.literal("Custom"),
+                "Descricao",
+                "Utilize esta opcao para reduzir o impacto grafico em servidores remotos.",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertTrue(optCustom.hasTip());
+        assertTrue(optCustom.hasCustomTip());
+
+        // Override explicito via withCustomTip
+        RotaConfigOption optForced = RotaConfigOption.booleanToggle(
+                Component.literal("Forcado"),
+                "Descricao",
+                "Ativado: modo avancado",
+                true,
+                () -> true,
+                v -> {}
+        ).withCustomTip("Ativado: modo avancado");
+        assertTrue(optForced.hasTip());
+        assertTrue(optForced.isCustomTipExplicit());
+
+        // Governanca de exibicao do valor padrao
+        assertFalse(optCustom.shouldShowDefaultValue());
+        optCustom.withShowDefaultValue(true);
+        assertTrue(optCustom.shouldShowDefaultValue());
+    }
+
+    @Test
+    public void testConvenienceFactoryOverloads() {
+        RotaConfigOption boolOpt = RotaConfigOption.booleanToggle(
+                Component.literal("Toggle"),
+                "Desc",
+                false,
+                () -> false,
+                v -> {}
+        );
+        assertEquals(RotaConfigOption.Type.BOOLEAN, boolOpt.getType());
+        assertNull(boolOpt.getExampleTip());
+        assertFalse(boolOpt.hasTip());
+
+        RotaConfigOption intOpt = RotaConfigOption.intSlider(
+                Component.literal("Slider"),
+                "Desc",
+                5,
+                1,
+                10,
+                String::valueOf,
+                () -> 5,
+                v -> {}
+        );
+        assertEquals(RotaConfigOption.Type.INT_SLIDER, intOpt.getType());
+        assertNull(intOpt.getExampleTip());
+
+        RotaConfigOption doubleOpt = RotaConfigOption.doubleSlider(
+                Component.literal("Double"),
+                "Desc",
+                2.5,
+                1.0,
+                5.0,
+                null,
+                () -> 2.5,
+                v -> {}
+        );
+        assertEquals(RotaConfigOption.Type.DOUBLE_SLIDER, doubleOpt.getType());
+        assertNull(doubleOpt.getExampleTip());
+
+        RotaConfigOption actOpt = RotaConfigOption.action(
+                Component.literal("Action"),
+                "Desc",
+                "Executar",
+                () -> {}
+        );
+        assertEquals(RotaConfigOption.Type.ACTION, actOpt.getType());
+        assertNull(actOpt.getExampleTip());
+
+        RotaConfigOption cycleOpt = RotaConfigOption.cycle(
+                Component.literal("Cycle"),
+                "Desc",
+                "Normal",
+                () -> "Normal",
+                () -> {}
+        );
+        assertEquals(RotaConfigOption.Type.CYCLE, cycleOpt.getType());
+        assertNull(cycleOpt.getExampleTip());
+    }
 }

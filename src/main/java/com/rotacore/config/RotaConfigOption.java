@@ -23,8 +23,11 @@ public class RotaConfigOption {
     private final Type type;
     private final Component title;
     private final String description;
-    private final String exampleTip;
+    private String exampleTip;
     private final String defaultValueText;
+    private boolean customTipExplicit = false;
+    private boolean tipExplicitlyForced = false;
+    private boolean showDefaultValue = false;
 
     // Callbacks para os controles
     private BooleanSupplier booleanGetter;
@@ -188,12 +191,125 @@ public class RotaConfigOption {
         return opt;
     }
 
+    public static RotaConfigOption booleanToggle(
+            Component title,
+            String description,
+            boolean defaultValue,
+            BooleanSupplier getter,
+            Consumer<Boolean> setter
+    ) {
+        return booleanToggle(title, description, null, defaultValue, getter, setter);
+    }
+
+    public static RotaConfigOption intSlider(
+            Component title,
+            String description,
+            int defaultValue,
+            int min,
+            int max,
+            Function<Integer, String> formatter,
+            IntSupplier getter,
+            IntConsumer setter
+    ) {
+        return intSlider(title, description, null, defaultValue, min, max, formatter, getter, setter);
+    }
+
+    public static RotaConfigOption doubleSlider(
+            Component title,
+            String description,
+            double defaultValue,
+            double min,
+            double max,
+            Function<Double, String> formatter,
+            DoubleSupplier getter,
+            DoubleConsumer setter
+    ) {
+        return doubleSlider(title, description, null, defaultValue, min, max, formatter, getter, setter);
+    }
+
+    public static RotaConfigOption action(
+            Component title,
+            String description,
+            String buttonText,
+            Runnable action
+    ) {
+        return action(title, description, null, buttonText, action);
+    }
+
+    public static RotaConfigOption cycle(
+            Component title,
+            String description,
+            String defaultValueText,
+            Supplier<String> getter,
+            Runnable cycleAction
+    ) {
+        return cycle(title, description, null, defaultValueText, getter, cycleAction);
+    }
+
     // Getters
     public Type getType() { return type; }
     public Component getTitle() { return title; }
     public String getDescription() { return description; }
     public String getExampleTip() { return exampleTip; }
     public String getDefaultValueText() { return defaultValueText; }
+
+    public boolean hasTip() {
+        if (exampleTip == null || exampleTip.trim().isEmpty()) {
+            return false;
+        }
+        if (customTipExplicit) {
+            return true;
+        }
+        return !isGenericTip(exampleTip);
+    }
+
+    public boolean hasCustomTip() {
+        return hasTip();
+    }
+
+    public static boolean isGenericTip(String tip) {
+        if (tip == null || tip.trim().isEmpty()) {
+            return true;
+        }
+        String lower = tip.trim().toLowerCase(java.util.Locale.ROOT);
+        return lower.startsWith("ativado:") || lower.startsWith("ativado =") || lower.startsWith("ativado -")
+                || lower.startsWith("desativado:") || lower.startsWith("desativado =") || lower.startsWith("desativado -")
+                || lower.startsWith("padrão:") || lower.startsWith("padrao:") || lower.startsWith("padrão =") || lower.startsWith("padrao =")
+                || lower.startsWith("padrão recomendado") || lower.startsWith("padrao recomendado");
+    }
+
+    public RotaConfigOption withCustomTip(String tip) {
+        this.exampleTip = tip;
+        this.customTipExplicit = tip != null && !tip.trim().isEmpty();
+        return this;
+    }
+
+    public RotaConfigOption withCustomTip(boolean customTipExplicit) {
+        this.customTipExplicit = customTipExplicit;
+        return this;
+    }
+
+    public boolean isCustomTipExplicit() {
+        return customTipExplicit;
+    }
+
+    public RotaConfigOption withForceTip(boolean force) {
+        this.tipExplicitlyForced = force;
+        return this;
+    }
+
+    public boolean isTipExplicitlyForced() {
+        return tipExplicitlyForced;
+    }
+
+    public RotaConfigOption withShowDefaultValue(boolean show) {
+        this.showDefaultValue = show;
+        return this;
+    }
+
+    public boolean shouldShowDefaultValue() {
+        return showDefaultValue;
+    }
 
     public boolean getBooleanValue() { return booleanGetter != null && booleanGetter.getAsBoolean(); }
     public void setBooleanValue(boolean v) { if (booleanSetter != null) booleanSetter.accept(v); }

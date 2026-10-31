@@ -1,3 +1,10 @@
+# Version v1.15.0 - Inspector Redundant Tip Omission & Texture Preview Fit
+
+## Overview
+Version **v1.15.0** refines the Inspector panel of `RotaCategoryScreen` by omitting redundant "Dica / Exemplo:" and "Padrão recomendado:" blocks by default when options are self-explanatory or already express their state via buttons and sliders. For options configured with texture preview cards (`withTexturePreview`), vertical space is prioritized so that preview graphics (138px height) and captions fit cleanly within visible panel dimensions across all standard GUI scales without requiring scrolling.
+
+---
+
 # Version v1.10.0 - Inspector Preview Ordering & Canonical Alignment
 
 ## Overview

@@ -157,4 +157,73 @@ public class RotaCategoryScreenTest {
         int iconsHeight = screen.calculateInspectorContentHeight(optWithIcons, 200);
         assertTrue(iconsHeight >= baseHeight + 25, "Opcao com galeria de icones deve incluir gridHeight + 25");
     }
+
+    @Test
+    public void testShouldRenderTipAndDefaultGovernance() {
+        // Opcao sem dica
+        RotaConfigOption optNoTip = RotaConfigOption.booleanToggle(
+                Component.literal("Opcao"),
+                "Descricao",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertFalse(RotaCategoryScreen.shouldRenderTip(optNoTip));
+        assertFalse(RotaCategoryScreen.shouldRenderDefaultValue(optNoTip));
+
+        // Opcao com dica generica filtrada
+        RotaConfigOption optGenericTip = RotaConfigOption.booleanToggle(
+                Component.literal("Opcao"),
+                "Descricao",
+                "Ativado: liga. Desativado: desliga.",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertFalse(RotaCategoryScreen.shouldRenderTip(optGenericTip));
+        assertFalse(RotaCategoryScreen.shouldRenderDefaultValue(optGenericTip));
+
+        // Opcao com dica customizada relevante
+        RotaConfigOption optCustomTip = RotaConfigOption.booleanToggle(
+                Component.literal("Opcao"),
+                "Descricao",
+                "Recomendado para otimizar desempenho.",
+                true,
+                () -> true,
+                v -> {}
+        );
+        assertTrue(RotaCategoryScreen.shouldRenderTip(optCustomTip));
+        assertFalse(RotaCategoryScreen.shouldRenderDefaultValue(optCustomTip));
+
+        // Opcao com valor padrao explicitamente solicitado
+        optCustomTip.withShowDefaultValue(true);
+        assertTrue(RotaCategoryScreen.shouldRenderDefaultValue(optCustomTip));
+    }
+
+    @Test
+    public void testTexturePreviewOmitsRedundantTipsToFitWithoutScroll() {
+        ResourceLocation previewLoc = ResourceLocation.fromNamespaceAndPath("rota_map", "textures/gui/preview/theme_preview.png");
+        RotaConfigOption optWithPreview = RotaConfigOption.booleanToggle(
+                Component.literal("Hachuras Costeiras"),
+                "Desenha linhas concentricas de arrebentacao marinha em nanquim sepia.",
+                "Ativado: ondas classicas de cartas nauticas antigas. Desativado: lamina de agua uniforme.",
+                true,
+                () -> true,
+                v -> {}
+        ).withTexturePreview(previewLoc, 128, 128, Component.literal("Pre-visualizacao do Tema"));
+
+        // Dica redundante e padrao recomendado devem ser suprimidos para priorizar espaco vertical
+        assertFalse(RotaCategoryScreen.shouldRenderTip(optWithPreview), "Preview de textura deve omitir dicas genericas");
+        assertFalse(RotaCategoryScreen.shouldRenderDefaultValue(optWithPreview), "Preview de textura deve omitir padrao recomendado");
+
+        RotaCategory category = new RotaCategory("test_preview", Component.literal("Tema"), "Desc", () -> List.of(optWithPreview));
+        RotaCategoryScreen screen = new RotaCategoryScreen(null, category);
+
+        int contentHeight = screen.calculateInspectorContentHeight(optWithPreview, 180);
+
+        // Em uma resolucao comum com viewport util de 240px ou superior, o conteudo completo cabe sem barra de rolagem
+        int commonVisibleHeight = 250;
+        double maxScroll = RotaCategoryScreen.calculateMaxScroll(contentHeight, commonVisibleHeight);
+        assertEquals(0.0, maxScroll, 0.001, "Card de textura e cabecalho devem caber perfeitamente sem scroll (maxScroll == 0)");
+    }
 }
