@@ -12,6 +12,7 @@
   * O assistente apresenta a sugestão fundamentada ao usuário e **aguarda sua aprovação expressa** antes de aplicar a numeração oficial.
 - **Versões de Desenvolvimento Interno e Laboratório (Controladas pelo Assistente)**:
   * Durante o processo de refinamento, triagem e testes intermediários, o assistente pode gerar quantas builds locais forem necessárias para a pasta de mods da instância de teste (utilizando sufixos como `-dev.1`, `-dev.2` ou mantendo a base de trabalho), sem inflar a numeração oficial nem criar dezenas de versões públicas fantasmas.
+  * Toda build intermediária, pacote de teste local ou versão experimental descartada deve residir obrigatoriamente dentro de `versions/archive_dev_builds/`, impedindo a poluição visual na raiz de distribuição e mantendo o histórico de trabalho totalmente preservado e recuperável.
   * Cada avanço e ajuste deve ser preservado e rastreável via commits descritivos no Git local.
 - **Preservação de Código Estável**: Nunca refazer ou apagar algoritmos funcionais sem criar uma nova branch ou garantir que a versão estável anterior esteja 100% preservada e recuperável via Git.
 
@@ -30,7 +31,8 @@ Estrutura obrigatória por mod:
 │   ├── CONFIGURATION_GUIDE.md         # Documentação de todas as opções de configuração
 │   └── DIRETRIZES_MOD.md              # Diretrizes técnicas específicas deste mod
 └── versions/
-    └── v<X.Y.Z>/
+    ├── archive_dev_builds/            # Builds intermediárias, testes e históricos de laboratório
+    └── v<X.Y.Z>/                      # Apenas versões fechadas oficiais de lançamento público
         ├── <mod_id>-<X.Y.Z>.jar       # Arquivo compilado e testado pronto para publicação
         ├── CHANGELOG.md               # Notas detalhadas da versão e correções
         └── RELEASE_INFO.json          # Metadados JSON (versões, loader, checksum SHA256)
