@@ -97,4 +97,54 @@ public class RotaConfigEntryTest {
         assertEquals(96, sliderEntry.getControlWidget().getWidth());
         assertNotNull(sliderEntry.getSecondaryButton());
     }
+
+    @Test
+    public void testItemEntryWidgetsAndInteractions() {
+        boolean[] active = new boolean[]{true};
+        boolean[] movedUp = new boolean[]{false};
+        boolean[] movedDown = new boolean[]{false};
+        boolean[] edited = new boolean[]{false};
+
+        net.minecraft.resources.ResourceLocation tex = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/compass.png");
+
+        RotaConfigOption opt = RotaConfigOption.itemEntry(
+                Component.literal("Missão de Reconhecimento"),
+                "Explorar 500 blocos ao norte",
+                tex,
+                () -> active[0],
+                v -> active[0] = v,
+                () -> movedUp[0] = true,
+                () -> movedDown[0] = true,
+                () -> edited[0] = true
+        );
+
+        RotaConfigEntry entry = new RotaConfigEntry(opt, null, 120);
+
+        assertNotNull(entry.getUpButton(), "Botão para cima deve estar presente");
+        assertNotNull(entry.getDownButton(), "Botão para baixo deve estar presente");
+        assertNotNull(entry.getItemToggle(), "Switch de ativação deve estar presente");
+        assertNotNull(entry.getSecondaryButton(), "Botão de engrenagem deve estar presente");
+
+        assertEquals(16, entry.getUpButton().getWidth());
+        assertEquals(16, entry.getDownButton().getWidth());
+        assertEquals(70, entry.getItemToggle().getWidth());
+        assertEquals(20, entry.getSecondaryButton().getWidth());
+
+        assertTrue(entry.children().contains(entry.getUpButton()));
+        assertTrue(entry.children().contains(entry.getDownButton()));
+        assertTrue(entry.children().contains(entry.getItemToggle()));
+        assertTrue(entry.children().contains(entry.getSecondaryButton()));
+
+        entry.getUpButton().onPress();
+        assertTrue(movedUp[0]);
+
+        entry.getDownButton().onPress();
+        assertTrue(movedDown[0]);
+
+        entry.getItemToggle().onPress();
+        assertFalse(active[0]);
+
+        entry.getSecondaryButton().onPress();
+        assertTrue(edited[0]);
+    }
 }

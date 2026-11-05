@@ -323,4 +323,52 @@ public class RotaConfigOptionTest {
         assertEquals(RotaConfigOption.Type.CYCLE, cycleOpt.getType());
         assertNull(cycleOpt.getExampleTip());
     }
+
+    @Test
+    public void testItemEntryOption() {
+        boolean[] active = new boolean[]{true};
+        boolean[] movedUp = new boolean[]{false};
+        boolean[] movedDown = new boolean[]{false};
+        boolean[] edited = new boolean[]{false};
+
+        ResourceLocation tex = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/book.png");
+
+        RotaConfigOption opt = RotaConfigOption.itemEntry(
+                Component.literal("Capítulo 1"),
+                "Descrição do capítulo",
+                tex,
+                () -> active[0],
+                v -> active[0] = v,
+                () -> movedUp[0] = true,
+                () -> movedDown[0] = true,
+                () -> edited[0] = true
+        );
+
+        assertEquals(RotaConfigOption.Type.ITEM_ENTRY, opt.getType());
+        assertEquals("Capítulo 1", opt.getTitle().getString());
+        assertEquals("Descrição do capítulo", opt.getDescription());
+        assertTrue(opt.hasTextureIcon());
+        assertEquals(tex, opt.getTextureIcon());
+        assertFalse(opt.hasItemStackIcon());
+
+        // Toggle
+        assertTrue(opt.hasItemToggle());
+        assertTrue(opt.isItemActive());
+        opt.setItemActive(false);
+        assertFalse(active[0]);
+        assertFalse(opt.isItemActive());
+
+        // Reordenação
+        assertTrue(opt.hasReorderActions());
+        assertTrue(opt.isShowReorderButtons());
+        opt.moveUp();
+        assertTrue(movedUp[0]);
+        opt.moveDown();
+        assertTrue(movedDown[0]);
+
+        // Ação Secundária (⚙)
+        assertTrue(opt.hasSecondaryAction());
+        opt.getSecondaryAction().run();
+        assertTrue(edited[0]);
+    }
 }

@@ -3,6 +3,7 @@ package com.rotacore.config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.*;
 
@@ -17,7 +18,8 @@ public class RotaConfigOption {
         INT_SLIDER,
         DOUBLE_SLIDER,
         CYCLE,
-        ACTION
+        ACTION,
+        ITEM_ENTRY
     }
 
     private final Type type;
@@ -60,6 +62,16 @@ public class RotaConfigOption {
     private int texturePreviewWidth = 128;
     private int texturePreviewHeight = 128;
     private Component texturePreviewCaption = null;
+
+    // Campos para ITEM_ENTRY
+    private Supplier<ItemStack> itemStackIconSupplier;
+    private ResourceLocation textureIcon;
+    private Supplier<ResourceLocation> textureIconSupplier;
+    private BooleanSupplier itemActiveGetter;
+    private Consumer<Boolean> itemActiveSetter;
+    private Runnable moveUpAction;
+    private Runnable moveDownAction;
+    private boolean showReorderButtons = false;
 
     private boolean requiresAdmin = false;
     private boolean clientOnly = false;
@@ -244,6 +256,133 @@ public class RotaConfigOption {
             Runnable cycleAction
     ) {
         return cycle(title, description, null, defaultValueText, getter, cycleAction);
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            String exampleTip,
+            ItemStack itemIcon,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown,
+            Runnable editAction
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.ITEM_ENTRY,
+                title,
+                description,
+                exampleTip,
+                "—"
+        );
+        if (itemIcon != null) {
+            opt.itemStackIconSupplier = () -> itemIcon;
+        }
+        opt.itemActiveGetter = activeGetter;
+        opt.itemActiveSetter = activeSetter;
+        opt.moveUpAction = moveUp;
+        opt.moveDownAction = moveDown;
+        opt.showReorderButtons = (moveUp != null || moveDown != null);
+        if (editAction != null) {
+            opt.withSecondaryAction(editAction, Component.literal("Configurar..."));
+        }
+        return opt;
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            Supplier<ItemStack> itemIconSupplier,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown,
+            Runnable editAction
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.ITEM_ENTRY,
+                title,
+                description,
+                null,
+                "—"
+        );
+        opt.itemStackIconSupplier = itemIconSupplier;
+        opt.itemActiveGetter = activeGetter;
+        opt.itemActiveSetter = activeSetter;
+        opt.moveUpAction = moveUp;
+        opt.moveDownAction = moveDown;
+        opt.showReorderButtons = (moveUp != null || moveDown != null);
+        if (editAction != null) {
+            opt.withSecondaryAction(editAction, Component.literal("Configurar..."));
+        }
+        return opt;
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            ItemStack itemIcon,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown,
+            Runnable editAction
+    ) {
+        return itemEntry(title, description, (String) null, itemIcon, activeGetter, activeSetter, moveUp, moveDown, editAction);
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            ItemStack itemIcon,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown
+    ) {
+        return itemEntry(title, description, (String) null, itemIcon, activeGetter, activeSetter, moveUp, moveDown, null);
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            ResourceLocation textureIcon,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown,
+            Runnable editAction
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.ITEM_ENTRY,
+                title,
+                description,
+                null,
+                "—"
+        );
+        opt.textureIcon = textureIcon;
+        opt.itemActiveGetter = activeGetter;
+        opt.itemActiveSetter = activeSetter;
+        opt.moveUpAction = moveUp;
+        opt.moveDownAction = moveDown;
+        opt.showReorderButtons = (moveUp != null || moveDown != null);
+        if (editAction != null) {
+            opt.withSecondaryAction(editAction, Component.literal("Configurar..."));
+        }
+        return opt;
+    }
+
+    public static RotaConfigOption itemEntry(
+            Component title,
+            String description,
+            ResourceLocation textureIcon,
+            BooleanSupplier activeGetter,
+            Consumer<Boolean> activeSetter,
+            Runnable moveUp,
+            Runnable moveDown
+    ) {
+        return itemEntry(title, description, textureIcon, activeGetter, activeSetter, moveUp, moveDown, null);
     }
 
     // Getters
@@ -459,5 +598,121 @@ public class RotaConfigOption {
             return true;
         }
         return hasAdminPermissions;
+    }
+
+    // ITEM_ENTRY Getters & Setters & Builders
+    public ItemStack getItemStackIcon() {
+        if (itemStackIconSupplier != null) {
+            ItemStack stack = itemStackIconSupplier.get();
+            return stack != null ? stack : ItemStack.EMPTY;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public boolean hasItemStackIcon() {
+        if (itemStackIconSupplier == null) {
+            return false;
+        }
+        ItemStack stack = itemStackIconSupplier.get();
+        return stack != null && !stack.isEmpty();
+    }
+
+    public RotaConfigOption withItemStack(ItemStack stack) {
+        this.itemStackIconSupplier = () -> stack != null ? stack : ItemStack.EMPTY;
+        return this;
+    }
+
+    public RotaConfigOption withItemStack(Supplier<ItemStack> supplier) {
+        this.itemStackIconSupplier = supplier;
+        return this;
+    }
+
+    public ResourceLocation getTextureIcon() {
+        if (textureIconSupplier != null) {
+            return textureIconSupplier.get();
+        }
+        return textureIcon;
+    }
+
+    public boolean hasTextureIcon() {
+        return getTextureIcon() != null;
+    }
+
+    public RotaConfigOption withTextureIcon(ResourceLocation texture) {
+        this.textureIcon = texture;
+        return this;
+    }
+
+    public RotaConfigOption withTextureIcon(Supplier<ResourceLocation> supplier) {
+        this.textureIconSupplier = supplier;
+        return this;
+    }
+
+    public boolean hasItemToggle() {
+        return itemActiveGetter != null && itemActiveSetter != null;
+    }
+
+    public boolean isItemActive() {
+        return itemActiveGetter != null && itemActiveGetter.getAsBoolean();
+    }
+
+    public void setItemActive(boolean active) {
+        if (itemActiveSetter != null) {
+            itemActiveSetter.accept(active);
+        }
+    }
+
+    public BooleanSupplier getItemActiveGetter() {
+        return itemActiveGetter;
+    }
+
+    public Consumer<Boolean> getItemActiveSetter() {
+        return itemActiveSetter;
+    }
+
+    public RotaConfigOption withItemToggle(BooleanSupplier getter, Consumer<Boolean> setter) {
+        this.itemActiveGetter = getter;
+        this.itemActiveSetter = setter;
+        return this;
+    }
+
+    public boolean hasReorderActions() {
+        return moveUpAction != null || moveDownAction != null;
+    }
+
+    public boolean isShowReorderButtons() {
+        return showReorderButtons || hasReorderActions();
+    }
+
+    public RotaConfigOption withShowReorderButtons(boolean show) {
+        this.showReorderButtons = show;
+        return this;
+    }
+
+    public Runnable getMoveUpAction() {
+        return moveUpAction;
+    }
+
+    public Runnable getMoveDownAction() {
+        return moveDownAction;
+    }
+
+    public void moveUp() {
+        if (moveUpAction != null) {
+            moveUpAction.run();
+        }
+    }
+
+    public void moveDown() {
+        if (moveDownAction != null) {
+            moveDownAction.run();
+        }
+    }
+
+    public RotaConfigOption withReorderActions(Runnable moveUp, Runnable moveDown) {
+        this.moveUpAction = moveUp;
+        this.moveDownAction = moveDown;
+        this.showReorderButtons = (moveUp != null || moveDown != null);
+        return this;
     }
 }

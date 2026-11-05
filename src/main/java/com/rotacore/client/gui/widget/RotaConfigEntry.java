@@ -11,6 +11,8 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,9 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
 
     private AbstractWidget controlWidget;
     private RotaButton secondaryButton;
+    private RotaButton upButton;
+    private RotaButton downButton;
+    private RotaSwitch itemToggle;
 
     public RotaConfigEntry(RotaConfigOption option, RotaCategoryScreen parentScreen, int controlWidth) {
         this.option = option;
@@ -115,6 +120,37 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 this.children.add(button);
                 this.narratables.add(button);
             }
+            case ITEM_ENTRY -> {
+                if (option.hasReorderActions()) {
+                    this.upButton = new RotaButton(
+                            0, 0, 16, btnHeight,
+                            Component.literal("▲"),
+                            btn -> option.moveUp()
+                    );
+                    this.upButton.setTooltip(Tooltip.create(Component.literal("Mover para cima")));
+                    this.children.add(this.upButton);
+                    this.narratables.add(this.upButton);
+
+                    this.downButton = new RotaButton(
+                            0, 0, 16, btnHeight,
+                            Component.literal("▼"),
+                            btn -> option.moveDown()
+                    );
+                    this.downButton.setTooltip(Tooltip.create(Component.literal("Mover para baixo")));
+                    this.children.add(this.downButton);
+                    this.narratables.add(this.downButton);
+                }
+
+                if (option.hasItemToggle()) {
+                    this.itemToggle = new RotaSwitch(
+                            0, 0, 70, btnHeight,
+                            option.isItemActive(),
+                            option::setItemActive
+                    );
+                    this.children.add(this.itemToggle);
+                    this.narratables.add(this.itemToggle);
+                }
+            }
             case HEADER -> {
                 // Header não possui controle interativo
             }
@@ -145,6 +181,15 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             if (this.secondaryButton != null) {
                 this.secondaryButton.active = false;
             }
+            if (this.upButton != null) {
+                this.upButton.active = false;
+            }
+            if (this.downButton != null) {
+                this.downButton.active = false;
+            }
+            if (this.itemToggle != null) {
+                this.itemToggle.active = false;
+            }
         }
     }
 
@@ -169,12 +214,16 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
 
         // Notifica o painel lateral quando o mouse estiver sobre o item
         if (isHovered && option.getType() != RotaConfigOption.Type.HEADER) {
-            parentScreen.setFocusedOption(option);
+            if (parentScreen != null) {
+                parentScreen.setFocusedOption(option);
+            }
         }
 
         if (option.getType() == RotaConfigOption.Type.HEADER) {
             int textY = top + (height - 9) / 2;
-            graphics.drawString(mc.font, option.getTitle(), left + 6, textY, 0xFFFFAA00, false);
+            if (mc != null && mc.font != null) {
+                graphics.drawString(mc.font, option.getTitle(), left + 6, textY, 0xFFFFAA00, false);
+            }
             int lineY = textY + 11;
             graphics.fill(left + 6, lineY, left + width - 12, lineY + 1, 0xFF555555);
             return;
@@ -185,22 +234,100 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             graphics.fill(left, top, left + width - 4, top + height, 0x22FFFFFF);
         }
 
-        // Título da opção
         int textY = top + (height - 9) / 2;
+        int controlY = top + (height - 20) / 2;
+
+        if (option.getType() == RotaConfigOption.Type.ITEM_ENTRY) {
+            // Slot do item à esquerda (18x18px)
+            int slotX = left + 4;
+            int slotY = top + (height - 18) / 2;
+            graphics.fill(slotX, slotY, slotX + 18, slotY + 18, 0xFF373737);
+            graphics.renderOutline(slotX, slotY, 18, 18, 0xFF555555);
+
+            if (option.hasItemStackIcon()) {
+                ItemStack iconStack = option.getItemStackIcon();
+                if (iconStack != null && !iconStack.isEmpty()) {
+                    graphics.renderFakeItem(iconStack, slotX + 1, slotY + 1);
+                }
+            } else if (option.hasTextureIcon()) {
+                ResourceLocation tex = option.getTextureIcon();
+                if (tex != null) {
+                    graphics.blit(tex, slotX + 1, slotY + 1, 0, 0, 16, 16, 16, 16);
+                }
+            }
+
+            // Controles à direita: [ ▲ ] [ ▼ ] [ ATIVADO / DESATIVADO ] [ ⚙ ]
+            int currRight = left + width - 6;
+
+            if (secondaryButton != null) {
+                currRight -= 20;
+                secondaryButton.active = canEdit;
+                secondaryButton.setX(currRight);
+                secondaryButton.setY(controlY);
+                secondaryButton.render(graphics, mouseX, mouseY, partialTick);
+                currRight -= 4;
+            }
+
+            if (itemToggle != null) {
+                currRight -= itemToggle.getWidth();
+                itemToggle.active = canEdit;
+                itemToggle.setX(currRight);
+                itemToggle.setY(controlY);
+                itemToggle.render(graphics, mouseX, mouseY, partialTick);
+                currRight -= 4;
+            }
+
+            if (downButton != null) {
+                currRight -= 16;
+                downButton.active = canEdit;
+                downButton.setX(currRight);
+                downButton.setY(controlY);
+                downButton.render(graphics, mouseX, mouseY, partialTick);
+                currRight -= 2;
+            }
+
+            if (upButton != null) {
+                currRight -= 16;
+                upButton.active = canEdit;
+                upButton.setX(currRight);
+                upButton.setY(controlY);
+                upButton.render(graphics, mouseX, mouseY, partialTick);
+                currRight -= 4;
+            }
+
+            // Título após o slot (left + 28)
+            int titleX = left + 28;
+            int maxTextWidth = Math.max(10, currRight - titleX - 4);
+            String titleStr = option.getTitle().getString();
+            if (!canEdit) {
+                titleStr = "§8[Bloqueado] §7" + titleStr;
+            }
+            if (mc != null && mc.font != null) {
+                if (mc.font.width(titleStr) > maxTextWidth) {
+                    titleStr = mc.font.plainSubstrByWidth(titleStr, maxTextWidth - 8) + "...";
+                }
+                int titleColor = !canEdit ? 0xFF888888 : (isHovered ? 0xFFFFFFFF : 0xFFDDDDDD);
+                graphics.drawString(mc.font, titleStr, titleX, textY, titleColor, false);
+            }
+            return;
+        }
+
+        // Título da opção
         int maxTextWidth = width - 140;
         String titleStr = option.getTitle().getString();
         if (!canEdit) {
             titleStr = "§8[Bloqueado] §7" + titleStr;
         }
-        if (mc.font.width(titleStr) > maxTextWidth) {
-            titleStr = mc.font.plainSubstrByWidth(titleStr, maxTextWidth - 8) + "...";
+        if (mc != null && mc.font != null) {
+            if (mc.font.width(titleStr) > maxTextWidth) {
+                titleStr = mc.font.plainSubstrByWidth(titleStr, maxTextWidth - 8) + "...";
+            }
+            int titleColor = !canEdit ? 0xFF888888 : (isHovered ? 0xFFFFFFFF : 0xFFDDDDDD);
+            graphics.drawString(mc.font, titleStr, left + 6, textY, titleColor, false);
         }
-        int titleColor = !canEdit ? 0xFF888888 : (isHovered ? 0xFFFFFFFF : 0xFFDDDDDD);
-        graphics.drawString(mc.font, titleStr, left + 6, textY, titleColor, false);
 
         // Renderiza o controle posicionado à direita
         int controlX = left + width - 130;
-        int controlY = top + (height - 20) / 2;
 
         if (controlWidget != null) {
             controlWidget.active = canEdit;
@@ -224,6 +351,18 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
 
     public RotaButton getSecondaryButton() {
         return secondaryButton;
+    }
+
+    public RotaButton getUpButton() {
+        return upButton;
+    }
+
+    public RotaButton getDownButton() {
+        return downButton;
+    }
+
+    public RotaSwitch getItemToggle() {
+        return itemToggle;
     }
 
     @Override
