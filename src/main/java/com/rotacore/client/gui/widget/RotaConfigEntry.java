@@ -370,7 +370,12 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
         if (!option.canPlayerEdit(Minecraft.getInstance())) {
             return false;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        boolean handled = super.mouseClicked(mouseX, mouseY, button);
+        if (!handled && option.getType() == RotaConfigOption.Type.ITEM_ENTRY && option.getActionCallback() != null) {
+            option.triggerAction();
+            return true;
+        }
+        return handled;
     }
 
     @Override

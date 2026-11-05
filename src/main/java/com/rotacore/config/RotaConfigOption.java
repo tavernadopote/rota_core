@@ -471,6 +471,15 @@ public class RotaConfigOption {
     public String getActionButtonText() { return actionButtonText != null ? actionButtonText : "Abrir"; }
     public void triggerAction() { if (actionCallback != null) actionCallback.run(); }
 
+    public RotaConfigOption withAction(Runnable action) {
+        this.actionCallback = action;
+        return this;
+    }
+
+    public Runnable getActionCallback() {
+        return actionCallback;
+    }
+
     public RotaConfigOption withSecondaryAction(Runnable action, Component tooltip) {
         this.secondaryAction = action;
         this.secondaryActionTooltip = tooltip != null ? tooltip : Component.literal("Configurar Parâmetros...");
