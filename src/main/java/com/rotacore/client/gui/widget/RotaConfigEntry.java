@@ -113,11 +113,21 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 this.narratables.add(button);
             }
             case ACTION -> {
+                int actionWidth = mainBtnWidth;
+                if (option.getActionIconSupplier() != null) {
+                    actionWidth = Math.max(140, actionWidth);
+                }
                 RotaButton button = new RotaButton(
-                        0, 0, mainBtnWidth, btnHeight,
+                        0, 0, actionWidth, btnHeight,
                         Component.literal(option.getActionButtonText()),
                         btn -> option.triggerAction()
                 );
+                if (option.isDangerAction()) {
+                    button.setDanger(true);
+                }
+                if (option.getActionIconSupplier() != null) {
+                    button.setIconSupplier(option.getActionIconSupplier());
+                }
                 this.controlWidget = button;
                 this.children.add(button);
                 this.narratables.add(button);
@@ -380,8 +390,13 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             return;
         }
 
+        // Renderiza o controle posicionado à direita
+        int totalRightWidth = (controlWidget != null ? controlWidget.getWidth() : 0)
+                + (secondaryButton != null ? (secondaryButton.getWidth() + 4) : 0);
+        int controlX = left + width - totalRightWidth - 8;
+
         // Título da opção
-        int maxTextWidth = width - 140;
+        int maxTextWidth = Math.max(10, controlX - (left + 6) - 8);
         String titleStr = option.getTitle().getString();
         if (!canEdit) {
             titleStr = "§8[Bloqueado] §7" + titleStr;
@@ -393,9 +408,6 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             int titleColor = !canEdit ? 0xFF888888 : (isHovered ? 0xFFFFFFFF : 0xFFDDDDDD);
             graphics.drawString(mc.font, titleStr, left + 6, textY, titleColor, false);
         }
-
-        // Renderiza o controle posicionado à direita
-        int controlX = left + width - 130;
 
         if (controlWidget != null) {
             controlWidget.active = canEdit;

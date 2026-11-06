@@ -2,6 +2,7 @@ package com.rotacore.client.gui.widget;
 
 import com.rotacore.config.RotaConfigOption;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -186,5 +187,55 @@ public class RotaConfigEntryTest {
         assertEquals(94, entry.getEntryHeight()); // 70 + 24
         assertEquals(1, entry.children().size());
         assertEquals(1, entry.narratables().size());
+    }
+
+    @Test
+    public void testDangerActionEntry() {
+        RotaConfigOption opt = RotaConfigOption.dangerAction(
+                Component.literal("Excluir Missão"),
+                "Ação destrutiva",
+                "Excluir",
+                () -> {}
+        );
+
+        RotaConfigEntry entry = new RotaConfigEntry(opt, null, 120);
+
+        assertNotNull(entry.getControlWidget());
+        assertTrue(entry.getControlWidget() instanceof RotaButton);
+        RotaButton btn = (RotaButton) entry.getControlWidget();
+        assertTrue(btn.isDanger());
+        assertEquals("Excluir", btn.getMessage().getString());
+    }
+
+    @Test
+    public void testActionWithIconEntry() {
+        RotaConfigOption opt = RotaConfigOption.action(
+                Component.literal("Ícone da Missão"),
+                "Seletor",
+                "Alterar...",
+                () -> {}
+        ).withActionIcon(() -> null);
+
+        RotaConfigEntry entry = new RotaConfigEntry(opt, null, 120);
+
+        assertNotNull(entry.getControlWidget());
+        assertTrue(entry.getControlWidget() instanceof RotaButton);
+        RotaButton btn = (RotaButton) entry.getControlWidget();
+        assertNotNull(btn.getIconSupplier());
+        assertTrue(btn.getWidth() >= 140, "Botão com ícone deve ter largura confortável de pelo menos 140px");
+    }
+
+    @Test
+    public void testRotaButtonDangerAndIconProperties() {
+        RotaButton button = new RotaButton(0, 0, 100, 20, Component.literal("Botão"), b -> {});
+        assertFalse(button.isDanger());
+        assertNull(button.getIconSupplier());
+
+        button.setDanger(true);
+        assertTrue(button.isDanger());
+
+        button.setIconSupplier(() -> null);
+        assertNotNull(button.getIconSupplier());
+        assertNull(button.getIconSupplier().get());
     }
 }

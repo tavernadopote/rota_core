@@ -54,6 +54,8 @@ public class RotaConfigOption {
 
     private Runnable actionCallback;
     private String actionButtonText;
+    private boolean dangerAction = false;
+    private Supplier<ItemStack> actionIconSupplier = null;
 
     private Supplier<String> stringGetter;
     private Consumer<String> stringSetter;
@@ -252,6 +254,35 @@ public class RotaConfigOption {
             Runnable action
     ) {
         return action(title, description, null, buttonText, action);
+    }
+
+    public static RotaConfigOption dangerAction(
+            Component title,
+            String description,
+            String exampleTip,
+            String buttonText,
+            Runnable callback
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.ACTION,
+                title,
+                description,
+                exampleTip,
+                "—"
+        );
+        opt.actionButtonText = buttonText;
+        opt.actionCallback = callback;
+        opt.dangerAction = true;
+        return opt;
+    }
+
+    public static RotaConfigOption dangerAction(
+            Component title,
+            String description,
+            String buttonText,
+            Runnable callback
+    ) {
+        return dangerAction(title, description, null, buttonText, callback);
     }
 
     public static RotaConfigOption cycle(
@@ -582,6 +613,24 @@ public class RotaConfigOption {
 
     public Runnable getActionCallback() {
         return actionCallback;
+    }
+
+    public boolean isDangerAction() {
+        return dangerAction;
+    }
+
+    public Supplier<ItemStack> getActionIconSupplier() {
+        return actionIconSupplier;
+    }
+
+    public RotaConfigOption withActionIcon(Supplier<ItemStack> iconSupplier) {
+        this.actionIconSupplier = iconSupplier;
+        return this;
+    }
+
+    public RotaConfigOption withActionIcon(ItemStack stack) {
+        this.actionIconSupplier = () -> stack != null ? stack : ItemStack.EMPTY;
+        return this;
     }
 
     public RotaConfigOption withSecondaryAction(Runnable action, Component tooltip) {

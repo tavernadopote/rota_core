@@ -2,6 +2,7 @@ package com.rotacore.config;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -432,5 +433,51 @@ public class RotaConfigOptionTest {
 
         defaultOpt.withMultilineHeight(100);
         assertEquals(100, defaultOpt.getMultilineHeight());
+    }
+
+    @Test
+    public void testDangerAction() {
+        boolean[] ran = new boolean[]{false};
+        RotaConfigOption opt = RotaConfigOption.dangerAction(
+                Component.literal("Excluir Missão"),
+                "Ação destrutiva e irreversível",
+                "Dica de perigo",
+                "Excluir",
+                () -> ran[0] = true
+        );
+
+        assertEquals(RotaConfigOption.Type.ACTION, opt.getType());
+        assertTrue(opt.isDangerAction());
+        assertEquals("Excluir Missão", opt.getTitle().getString());
+        assertEquals("Excluir", opt.getActionButtonText());
+
+        opt.triggerAction();
+        assertTrue(ran[0]);
+
+        // Teste de sobrecarga simplificada
+        RotaConfigOption simpleOpt = RotaConfigOption.dangerAction(
+                Component.literal("Excluir Capítulo"),
+                "Remove o capítulo",
+                "Apagar",
+                () -> {}
+        );
+        assertTrue(simpleOpt.isDangerAction());
+        assertEquals("Apagar", simpleOpt.getActionButtonText());
+    }
+
+    @Test
+    public void testActionIconSupplier() {
+        RotaConfigOption opt = RotaConfigOption.action(
+                Component.literal("Ícone da Missão"),
+                "Seletor de ícone",
+                "Alterar...",
+                () -> {}
+        );
+
+        assertNull(opt.getActionIconSupplier());
+
+        opt.withActionIcon(() -> null);
+        assertNotNull(opt.getActionIconSupplier());
+        assertNull(opt.getActionIconSupplier().get());
     }
 }
