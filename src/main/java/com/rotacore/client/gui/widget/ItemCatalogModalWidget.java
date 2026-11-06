@@ -215,6 +215,10 @@ public class ItemCatalogModalWidget extends Screen {
             this.parentScreen.render(graphics, -1, -1, partialTick);
         }
 
+        // Elevação Z=400: isola a janela modal para que nenhum componente da tela de fundo sobreponha o catálogo
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0f, 0.0f, 400.0f);
+
         // 2. Fundo escurecido semi-transparente cobrindo a tela inteira
         graphics.fill(0, 0, this.width, this.height, 0x88000000);
 
@@ -269,6 +273,8 @@ public class ItemCatalogModalWidget extends Screen {
         if (hoveredStack != null) {
             graphics.renderTooltip(this.font, hoveredStack, mouseX, mouseY);
         }
+
+        graphics.pose().popPose();
     }
 
     @Override

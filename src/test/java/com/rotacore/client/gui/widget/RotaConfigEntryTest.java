@@ -167,4 +167,24 @@ public class RotaConfigEntryTest {
         assertEquals(1, entry.children().size());
         assertEquals(1, entry.narratables().size());
     }
+
+    @Test
+    public void testMultilineStringInputEntry() {
+        String[] text = new String[]{"Crônica longa..."};
+        RotaConfigOption opt = RotaConfigOption.multilineStringInput(
+                Component.literal("História Narrativa"),
+                "Descrição",
+                "Crônica longa...",
+                70,
+                () -> text[0],
+                val -> text[0] = val
+        );
+
+        RotaConfigEntry entry = new RotaConfigEntry(opt, null, 120);
+
+        assertNotNull(entry.getControlWidget());
+        assertEquals(94, entry.getEntryHeight()); // 70 + 24
+        assertEquals(1, entry.children().size());
+        assertEquals(1, entry.narratables().size());
+    }
 }

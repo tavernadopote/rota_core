@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RotaConfigOptionTest {
 
+
     @Test
     public void testIconPreviews() {
         ResourceLocation icon1 = ResourceLocation.fromNamespaceAndPath("rota_map", "textures/gui/markers/icon_village.png");
@@ -393,5 +394,43 @@ public class RotaConfigOptionTest {
         opt.setStringValue("Missão dos Titãs");
         assertEquals("Missão dos Titãs", text[0]);
         assertEquals("Missão dos Titãs", opt.getStringValue());
+    }
+
+    @Test
+    public void testMultilineStringInputOption() {
+        String[] story = new String[]{"Era uma vez um aventureiro..."};
+        RotaConfigOption opt = RotaConfigOption.multilineStringInput(
+                Component.literal("História Narrativa"),
+                "Digite a crônica completa da missão",
+                "Ex: Descreva a lenda antiga...",
+                "Era uma vez...",
+                80,
+                () -> story[0],
+                val -> story[0] = val
+        );
+
+        assertEquals(RotaConfigOption.Type.MULTILINE_STRING_INPUT, opt.getType());
+        assertEquals("História Narrativa", opt.getTitle().getString());
+        assertEquals("Digite a crônica completa da missão", opt.getDescription());
+        assertEquals("Ex: Descreva a lenda antiga...", opt.getExampleTip());
+        assertEquals(80, opt.getMultilineHeight());
+        assertEquals("Era uma vez um aventureiro...", opt.getStringValue());
+
+        opt.setStringValue("Capítulo 1: O início da jornada na floresta.");
+        assertEquals("Capítulo 1: O início da jornada na floresta.", story[0]);
+        assertEquals("Capítulo 1: O início da jornada na floresta.", opt.getStringValue());
+
+        // Teste de fábrica sobrecarregada com altura padrão (60px)
+        RotaConfigOption defaultOpt = RotaConfigOption.multilineStringInput(
+                Component.literal("Crônica"),
+                "Descrição",
+                "Texto Padrão",
+                () -> "Conteúdo",
+                v -> {}
+        );
+        assertEquals(60, defaultOpt.getMultilineHeight());
+
+        defaultOpt.withMultilineHeight(100);
+        assertEquals(100, defaultOpt.getMultilineHeight());
     }
 }

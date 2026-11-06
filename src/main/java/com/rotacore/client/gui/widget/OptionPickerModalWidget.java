@@ -125,6 +125,10 @@ public class OptionPickerModalWidget extends Screen {
             this.parentScreen.render(graphics, -1, -1, partialTick);
         }
 
+        // Elevação Z=400: impede que textos, caixas de texto ou controles da tela de fundo vazem por cima do modal
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0f, 0.0f, 400.0f);
+
         // 2. Escurecimento translúcido uniforme
         graphics.fill(0, 0, this.width, this.height, 0x88000000);
 
@@ -216,6 +220,8 @@ public class OptionPickerModalWidget extends Screen {
         if (filteredOptions.isEmpty()) {
             graphics.drawCenteredString(this.font, "§7Nenhuma opção encontrada.", listX + listWidth / 2, listY + listHeight / 2 - 4, 0xFF888888);
         }
+
+        graphics.pose().popPose();
     }
 
     @Override

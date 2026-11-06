@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -133,6 +134,33 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 this.controlWidget = editBox;
                 this.children.add(editBox);
                 this.narratables.add(editBox);
+            }
+            case MULTILINE_STRING_INPUT -> {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc != null && mc.font != null) {
+                    MultiLineEditBox multiLineBox = new MultiLineEditBox(
+                            mc.font,
+                            0, 0,
+                            mainBtnWidth, option.getMultilineHeight(),
+                            Component.empty(),
+                            option.getTitle()
+                    );
+                    multiLineBox.setValue(option.getStringValue());
+                    multiLineBox.setValueListener(option::setStringValue);
+                    this.controlWidget = multiLineBox;
+                } else {
+                    EditBox stubBox = new EditBox(
+                            null,
+                            0, 0,
+                            mainBtnWidth, option.getMultilineHeight(),
+                            option.getTitle()
+                    );
+                    stubBox.setValue(option.getStringValue());
+                    stubBox.setResponder(option::setStringValue);
+                    this.controlWidget = stubBox;
+                }
+                this.children.add(this.controlWidget);
+                this.narratables.add(this.controlWidget);
             }
             case ITEM_ENTRY -> {
                 if (option.hasReorderActions()) {
@@ -326,6 +354,32 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
             return;
         }
 
+        if (option.getType() == RotaConfigOption.Type.MULTILINE_STRING_INPUT) {
+            // Título no topo da linha
+            String titleStr = option.getTitle().getString();
+            if (!canEdit) {
+                titleStr = "§8[Bloqueado] §7" + titleStr;
+            }
+            if (mc != null && mc.font != null) {
+                int titleColor = !canEdit ? 0xFF888888 : 0xFFFFAA00;
+                graphics.drawString(mc.font, titleStr, left + 6, top + 4, titleColor, false);
+            }
+
+            // MultiLineEditBox cobrindo a largura total útil
+            int boxX = left + 6;
+            int boxY = top + 16;
+            int boxW = width - 16;
+            if (controlWidget != null) {
+                controlWidget.active = canEdit;
+                controlWidget.setX(boxX);
+                controlWidget.setY(boxY);
+                controlWidget.setWidth(boxW);
+                controlWidget.setHeight(option.getMultilineHeight());
+                controlWidget.render(graphics, mouseX, mouseY, partialTick);
+            }
+            return;
+        }
+
         // Título da opção
         int maxTextWidth = width - 140;
         String titleStr = option.getTitle().getString();
@@ -377,6 +431,13 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
 
     public RotaSwitch getItemToggle() {
         return itemToggle;
+    }
+
+    public int getEntryHeight() {
+        if (option.getType() == RotaConfigOption.Type.MULTILINE_STRING_INPUT) {
+            return option.getMultilineHeight() + 24;
+        }
+        return 28;
     }
 
     @Override

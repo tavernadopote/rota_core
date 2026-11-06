@@ -20,6 +20,7 @@ public class RotaConfigOption {
         CYCLE,
         ACTION,
         STRING_INPUT,
+        MULTILINE_STRING_INPUT,
         ITEM_ENTRY
     }
 
@@ -56,6 +57,7 @@ public class RotaConfigOption {
 
     private Supplier<String> stringGetter;
     private Consumer<String> stringSetter;
+    private int multilineHeight = 60;
 
     private Runnable secondaryAction = null;
     private Component secondaryActionTooltip = Component.literal("Configurar Parâmetros...");
@@ -292,6 +294,60 @@ public class RotaConfigOption {
         return stringInput(title, description, null, defaultValue, getter, setter);
     }
 
+    public static RotaConfigOption multilineStringInput(
+            Component title,
+            String description,
+            String exampleTip,
+            String defaultValue,
+            int height,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.MULTILINE_STRING_INPUT,
+                title,
+                description,
+                exampleTip,
+                defaultValue != null ? defaultValue : ""
+        );
+        opt.multilineHeight = Math.max(20, height);
+        opt.stringGetter = getter;
+        opt.stringSetter = setter;
+        return opt;
+    }
+
+    public static RotaConfigOption multilineStringInput(
+            Component title,
+            String description,
+            String defaultValue,
+            int height,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        return multilineStringInput(title, description, null, defaultValue, height, getter, setter);
+    }
+
+    public static RotaConfigOption multilineStringInput(
+            Component title,
+            String description,
+            String exampleTip,
+            String defaultValue,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        return multilineStringInput(title, description, exampleTip, defaultValue, 60, getter, setter);
+    }
+
+    public static RotaConfigOption multilineStringInput(
+            Component title,
+            String description,
+            String defaultValue,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        return multilineStringInput(title, description, null, defaultValue, 60, getter, setter);
+    }
+
     public static RotaConfigOption itemEntry(
             Component title,
             String description,
@@ -509,6 +565,15 @@ public class RotaConfigOption {
     public void setStringValue(String value) { if (stringSetter != null) stringSetter.accept(value); }
     public Supplier<String> getStringGetter() { return stringGetter; }
     public Consumer<String> getStringSetter() { return stringSetter; }
+
+    public int getMultilineHeight() { return multilineHeight; }
+    public RotaConfigOption withMultilineHeight(int multilineHeight) {
+        this.multilineHeight = Math.max(20, multilineHeight);
+        return this;
+    }
+    public void setMultilineHeight(int multilineHeight) {
+        this.multilineHeight = Math.max(20, multilineHeight);
+    }
 
     public RotaConfigOption withAction(Runnable action) {
         this.actionCallback = action;
