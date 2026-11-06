@@ -147,4 +147,24 @@ public class RotaConfigEntryTest {
         entry.getSecondaryButton().onPress();
         assertTrue(edited[0]);
     }
+
+    @Test
+    public void testStringInputEntry() {
+        String[] text = new String[]{"Nome Original"};
+        RotaConfigOption opt = RotaConfigOption.stringInput(
+                Component.literal("Campo Texto"),
+                "Descrição",
+                "Nome Original",
+                () -> text[0],
+                val -> text[0] = val
+        );
+
+        RotaConfigEntry entry = new RotaConfigEntry(opt, null, 120);
+
+        assertNotNull(entry.getControlWidget());
+        assertTrue(entry.getControlWidget() instanceof net.minecraft.client.gui.components.EditBox);
+        assertEquals(120, entry.getControlWidget().getWidth());
+        assertEquals(1, entry.children().size());
+        assertEquals(1, entry.narratables().size());
+    }
 }

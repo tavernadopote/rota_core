@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -119,6 +120,19 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
                 this.controlWidget = button;
                 this.children.add(button);
                 this.narratables.add(button);
+            }
+            case STRING_INPUT -> {
+                Minecraft mc = Minecraft.getInstance();
+                EditBox editBox = new EditBox(
+                        mc != null ? mc.font : null,
+                        0, 0, mainBtnWidth, btnHeight,
+                        option.getTitle()
+                );
+                editBox.setValue(option.getStringValue());
+                editBox.setResponder(option::setStringValue);
+                this.controlWidget = editBox;
+                this.children.add(editBox);
+                this.narratables.add(editBox);
             }
             case ITEM_ENTRY -> {
                 if (option.hasReorderActions()) {
@@ -379,9 +393,27 @@ public class RotaConfigEntry extends ContainerObjectSelectionList.Entry<RotaConf
     }
 
     @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (!option.canPlayerEdit(Minecraft.getInstance())) {
+            return false;
+        }
+        for (GuiEventListener child : children) {
+            if (child.charTyped(codePoint, modifiers)) {
+                return true;
+            }
+        }
+        return super.charTyped(codePoint, modifiers);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!option.canPlayerEdit(Minecraft.getInstance())) {
             return false;
+        }
+        for (GuiEventListener child : children) {
+            if (child.keyPressed(keyCode, scanCode, modifiers)) {
+                return true;
+            }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

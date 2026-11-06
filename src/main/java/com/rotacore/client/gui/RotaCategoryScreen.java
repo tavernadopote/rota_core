@@ -167,6 +167,16 @@ public class RotaCategoryScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        // NO-OP absoluto: impede que o Minecraft aplique shaders de blur ou sujeira sobre os painéis
+    }
+
+    @Override
+    protected void renderMenuBackground(GuiGraphics g) {
+        // NO-OP absoluto
+    }
+
+    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         // Fundo padrão
         super.render(graphics, mouseX, mouseY, partialTick);

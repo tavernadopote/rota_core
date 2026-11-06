@@ -371,4 +371,27 @@ public class RotaConfigOptionTest {
         opt.getSecondaryAction().run();
         assertTrue(edited[0]);
     }
+
+    @Test
+    public void testStringInputOption() {
+        String[] text = new String[]{"Texto Inicial"};
+        RotaConfigOption opt = RotaConfigOption.stringInput(
+                Component.literal("Título da Missão"),
+                "Digite o nome da missão",
+                "Ex: Jornada Inicial",
+                "Texto Inicial",
+                () -> text[0],
+                val -> text[0] = val
+        );
+
+        assertEquals(RotaConfigOption.Type.STRING_INPUT, opt.getType());
+        assertEquals("Título da Missão", opt.getTitle().getString());
+        assertEquals("Digite o nome da missão", opt.getDescription());
+        assertEquals("Ex: Jornada Inicial", opt.getExampleTip());
+        assertEquals("Texto Inicial", opt.getStringValue());
+
+        opt.setStringValue("Missão dos Titãs");
+        assertEquals("Missão dos Titãs", text[0]);
+        assertEquals("Missão dos Titãs", opt.getStringValue());
+    }
 }

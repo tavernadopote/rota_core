@@ -19,6 +19,7 @@ public class RotaConfigOption {
         DOUBLE_SLIDER,
         CYCLE,
         ACTION,
+        STRING_INPUT,
         ITEM_ENTRY
     }
 
@@ -52,6 +53,9 @@ public class RotaConfigOption {
 
     private Runnable actionCallback;
     private String actionButtonText;
+
+    private Supplier<String> stringGetter;
+    private Consumer<String> stringSetter;
 
     private Runnable secondaryAction = null;
     private Component secondaryActionTooltip = Component.literal("Configurar Parâmetros...");
@@ -256,6 +260,36 @@ public class RotaConfigOption {
             Runnable cycleAction
     ) {
         return cycle(title, description, null, defaultValueText, getter, cycleAction);
+    }
+
+    public static RotaConfigOption stringInput(
+            Component title,
+            String description,
+            String exampleTip,
+            String defaultValue,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        RotaConfigOption opt = new RotaConfigOption(
+                Type.STRING_INPUT,
+                title,
+                description,
+                exampleTip,
+                defaultValue != null ? defaultValue : ""
+        );
+        opt.stringGetter = getter;
+        opt.stringSetter = setter;
+        return opt;
+    }
+
+    public static RotaConfigOption stringInput(
+            Component title,
+            String description,
+            String defaultValue,
+            Supplier<String> getter,
+            Consumer<String> setter
+    ) {
+        return stringInput(title, description, null, defaultValue, getter, setter);
     }
 
     public static RotaConfigOption itemEntry(
@@ -470,6 +504,11 @@ public class RotaConfigOption {
 
     public String getActionButtonText() { return actionButtonText != null ? actionButtonText : "Abrir"; }
     public void triggerAction() { if (actionCallback != null) actionCallback.run(); }
+
+    public String getStringValue() { return stringGetter != null ? stringGetter.get() : ""; }
+    public void setStringValue(String value) { if (stringSetter != null) stringSetter.accept(value); }
+    public Supplier<String> getStringGetter() { return stringGetter; }
+    public Consumer<String> getStringSetter() { return stringSetter; }
 
     public RotaConfigOption withAction(Runnable action) {
         this.actionCallback = action;

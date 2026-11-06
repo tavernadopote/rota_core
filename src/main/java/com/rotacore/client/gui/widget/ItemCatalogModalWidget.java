@@ -199,6 +199,16 @@ public class ItemCatalogModalWidget extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        // NO-OP absoluto: impede que o Minecraft aplique shaders de blur ou sujeira sobre os painéis
+    }
+
+    @Override
+    protected void renderMenuBackground(GuiGraphics g) {
+        // NO-OP absoluto
+    }
+
+    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         // 1. Renderiza a tela de trás estática se disponível
         if (this.parentScreen != null) {
