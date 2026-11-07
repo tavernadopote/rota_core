@@ -37,6 +37,7 @@ public class RotaConfigListWidget extends ContainerObjectSelectionList<RotaConfi
     }
 
     private void rebuildEntries() {
+        double savedScroll = this.getScrollAmount();
         this.clearEntries();
         for (RotaConfigOption opt : allOptions) {
             if (currentFilter.isEmpty()) {
@@ -52,7 +53,7 @@ public class RotaConfigListWidget extends ContainerObjectSelectionList<RotaConfi
                 }
             }
         }
-        this.setScrollAmount(0);
+        this.setScrollAmount(savedScroll);
     }
 
     @Override

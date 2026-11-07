@@ -110,9 +110,13 @@ public class RotaCategoryScreen extends Screen {
         int listHeight = this.height - topY - bottomHeight;
 
         // 1. Lista de Controles à Esquerda
+        double savedScroll = (this.listWidget != null) ? this.listWidget.getScrollAmount() : 0.0;
         this.listWidget = new RotaConfigListWidget(this.minecraft, listWidth, listHeight, topY, 28, this);
         List<RotaConfigOption> options = this.category.getOptions();
         this.listWidget.setOptions(options);
+        if (savedScroll > 0) {
+            this.listWidget.setScrollAmount(savedScroll);
+        }
 
         if (!options.isEmpty()) {
             for (RotaConfigOption opt : options) {
@@ -527,6 +531,19 @@ public class RotaCategoryScreen extends Screen {
         if (hoveredPreview != null && hoveredPreview.label() != null && !hoveredPreview.label().getString().isEmpty()) {
             graphics.renderTooltip(this.font, hoveredPreview.label(), mouseX, mouseY);
         }
+    }
+
+    public void refreshOptions() {
+        if (this.listWidget != null) {
+            double savedScroll = this.listWidget.getScrollAmount();
+            List<RotaConfigOption> options = this.category.getOptions();
+            this.listWidget.setOptions(options);
+            this.listWidget.setScrollAmount(savedScroll);
+        }
+    }
+
+    public RotaConfigListWidget getListWidget() {
+        return this.listWidget;
     }
 
     @Override
