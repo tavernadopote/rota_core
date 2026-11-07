@@ -480,4 +480,25 @@ public class RotaConfigOptionTest {
         assertNotNull(opt.getActionIconSupplier());
         assertNull(opt.getActionIconSupplier().get());
     }
+
+    @Test
+    public void testCustomInspectorRenderer() {
+        RotaConfigOption opt = RotaConfigOption.header("Criatura");
+
+        assertFalse(opt.hasCustomInspectorRenderer());
+        assertNull(opt.getCustomInspectorRenderer());
+        assertEquals(160, opt.getCustomInspectorHeight());
+
+        boolean[] rendered = new boolean[1];
+        opt.withCustomInspector((graphics, x, y, width, height, partialTick) -> {
+            rendered[0] = true;
+        }, 220);
+
+        assertTrue(opt.hasCustomInspectorRenderer());
+        assertNotNull(opt.getCustomInspectorRenderer());
+        assertEquals(220, opt.getCustomInspectorHeight());
+
+        opt.getCustomInspectorRenderer().render(null, 10, 20, 100, 220, 0.0f);
+        assertTrue(rendered[0]);
+    }
 }

@@ -211,7 +211,7 @@ public class RotaCategoryScreen extends Screen {
         graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, 0xFF444444);
 
         // Renderiza o Painel Inspector à Direita (~35% da Tela)
-        renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY, mouseX, mouseY);
+        renderInspectorPanel(graphics, listWidth + 8, topY, this.width - listWidth - 18, bottomY - topY, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -314,10 +314,15 @@ public class RotaCategoryScreen extends Screen {
             total += gridHeight + 25;
         }
 
+        // Inspector Customizado Rico (Visualizador 3D, Atributos, etc.)
+        if (option.hasCustomInspectorRenderer()) {
+            total += option.getCustomInspectorHeight() + 16;
+        }
+
         return total;
     }
 
-    private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height, int mouseX, int mouseY) {
+    private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height, int mouseX, int mouseY, float partialTick) {
         // Fundo escuro com borda suave na caixa completa (opaco)
         graphics.fill(x, y, x + width, y + height, 0xFF181818);
         graphics.renderOutline(x, y, width, height, 0xFF555555);
@@ -416,6 +421,17 @@ public class RotaCategoryScreen extends Screen {
                 textY += 11;
             }
             textY += 8;
+        }
+
+        // Inspector Customizado Rico (ex: Visualizador 3D, Graficos, Atributos de Criaturas, etc.)
+        if (focusedOption.hasCustomInspectorRenderer()) {
+            textY += 6;
+            int customH = focusedOption.getCustomInspectorHeight();
+            try {
+                focusedOption.getCustomInspectorRenderer().render(graphics, innerX, textY, innerWidth, customH, partialTick);
+            } catch (Throwable ignored) {
+            }
+            textY += customH + 8;
         }
 
         // Card de Pré-visualização de Textura do Mapa (ex: relevo hipsométrico de temas)

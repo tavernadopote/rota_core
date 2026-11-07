@@ -1,6 +1,7 @@
 package com.rotacore.config;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +12,11 @@ import java.util.function.*;
  * Representa um item ou configuração dentro de uma categoria de qualquer mod da Rota Mods.
  */
 public class RotaConfigOption {
+
+    @FunctionalInterface
+    public interface CustomInspectorRenderer {
+        void render(GuiGraphics graphics, int x, int y, int width, int height, float partialTick);
+    }
 
     public enum Type {
         HEADER,
@@ -70,6 +76,9 @@ public class RotaConfigOption {
     private int texturePreviewWidth = 128;
     private int texturePreviewHeight = 128;
     private Component texturePreviewCaption = null;
+
+    private CustomInspectorRenderer customInspectorRenderer = null;
+    private int customInspectorHeight = 160;
 
     // Campos para ITEM_ENTRY
     private Supplier<ItemStack> itemStackIconSupplier;
@@ -702,6 +711,29 @@ public class RotaConfigOption {
 
     public Component getTexturePreviewCaption() {
         return texturePreviewCaption;
+    }
+
+    public CustomInspectorRenderer getCustomInspectorRenderer() {
+        return customInspectorRenderer;
+    }
+
+    public boolean hasCustomInspectorRenderer() {
+        return customInspectorRenderer != null;
+    }
+
+    public int getCustomInspectorHeight() {
+        return customInspectorHeight;
+    }
+
+    public RotaConfigOption withCustomInspector(CustomInspectorRenderer renderer) {
+        this.customInspectorRenderer = renderer;
+        return this;
+    }
+
+    public RotaConfigOption withCustomInspector(CustomInspectorRenderer renderer, int height) {
+        this.customInspectorRenderer = renderer;
+        this.customInspectorHeight = height;
+        return this;
     }
 
     public RotaConfigOption requiresAdmin(boolean requiresAdmin) {
