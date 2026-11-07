@@ -31,26 +31,47 @@ public class RotaModuleCategoriesScreen extends Screen {
         this.onSaveCallback = onSaveCallback;
     }
 
+    public static final int BTN_WIDTH = 210;
+    public static final int BTN_HEIGHT = 22;
+    public static final int GAP_X = 14;
+    public static final int GAP_Y = 6;
+
+    public static int calculateGridStartY(int screenHeight) {
+        return Math.max(46, (screenHeight - 34 - (3 * BTN_HEIGHT + 2 * GAP_Y)) / 2 - 10);
+    }
+
+    public static int calculateDescriptionBoxY(int screenHeight, int boxHeight, int numCategories) {
+        int doneY = screenHeight - 34;
+        int boxY = doneY - boxHeight - 6;
+        int startY = calculateGridStartY(screenHeight);
+        int numRows = (numCategories + 1) / 2;
+        int gridBottom = startY + numRows * BTN_HEIGHT + Math.max(0, numRows - 1) * GAP_Y;
+
+        if (boxY < gridBottom + 4) {
+            boxY = gridBottom + 4;
+        }
+        int availableSpace = doneY - gridBottom;
+        if (availableSpace > boxHeight && boxY + boxHeight > doneY - 2) {
+            boxY = gridBottom + (availableSpace - boxHeight) / 2;
+        }
+        return boxY;
+    }
+
     @Override
     protected void init() {
-        int btnWidth = 210;
-        int btnHeight = 24;
-        int gapX = 14;
-        int gapY = 8;
-
-        int totalGridWidth = (btnWidth * 2) + gapX;
+        int totalGridWidth = (BTN_WIDTH * 2) + GAP_X;
         int startX = (this.width - totalGridWidth) / 2;
-        int startY = Math.max(50, this.height / 2 - 80);
+        int startY = calculateGridStartY(this.height);
 
         for (int i = 0; i < categories.size(); i++) {
             RotaCategory cat = categories.get(i);
             int col = i % 2;
             int row = i / 2;
 
-            int x = startX + col * (btnWidth + gapX);
-            int y = startY + row * (btnHeight + gapY);
+            int x = startX + col * (BTN_WIDTH + GAP_X);
+            int y = startY + row * (BTN_HEIGHT + GAP_Y);
 
-            RotaButton catButton = new RotaButton(x, y, btnWidth, btnHeight, cat.getTitle(), btn -> {
+            RotaButton catButton = new RotaButton(x, y, BTN_WIDTH, BTN_HEIGHT, cat.getTitle(), btn -> {
                 if (this.minecraft != null) {
                     this.minecraft.setScreen(cat.createScreen(this, onSaveCallback));
                 }
@@ -108,8 +129,7 @@ public class RotaModuleCategoriesScreen extends Screen {
             int boxWidth = Math.min(maxLineWidth + paddingX * 2, this.width - 20);
             int boxHeight = totalTextHeight + paddingY * 2;
             int boxX = (this.width - boxWidth) / 2;
-            int doneY = this.height - 34; // posição Y do botão Concluído
-            int boxY = doneY - boxHeight - 6;
+            int boxY = calculateDescriptionBoxY(this.height, boxHeight, categories.size());
 
             // Fundo escuro translúcido com contorno sutil
             graphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x99000000);
@@ -126,21 +146,17 @@ public class RotaModuleCategoriesScreen extends Screen {
     }
 
     private void detectHoveredDescription(int mouseX, int mouseY) {
-        int btnWidth = 210;
-        int btnHeight = 24;
-        int gapX = 14;
-        int gapY = 8;
-        int totalGridWidth = (btnWidth * 2) + gapX;
+        int totalGridWidth = (BTN_WIDTH * 2) + GAP_X;
         int startX = (this.width - totalGridWidth) / 2;
-        int startY = Math.max(50, this.height / 2 - 80);
+        int startY = calculateGridStartY(this.height);
 
         for (int i = 0; i < categories.size(); i++) {
             int col = i % 2;
             int row = i / 2;
-            int x = startX + col * (btnWidth + gapX);
-            int y = startY + row * (btnHeight + gapY);
+            int x = startX + col * (BTN_WIDTH + GAP_X);
+            int y = startY + row * (BTN_HEIGHT + GAP_Y);
 
-            if (mouseX >= x && mouseX <= x + btnWidth && mouseY >= y && mouseY <= y + btnHeight) {
+            if (mouseX >= x && mouseX <= x + BTN_WIDTH && mouseY >= y && mouseY <= y + BTN_HEIGHT) {
                 this.hoveredDescription = categories.get(i).getDescription();
                 return;
             }

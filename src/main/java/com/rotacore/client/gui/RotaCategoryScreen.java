@@ -171,23 +171,35 @@ public class RotaCategoryScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        // NO-OP absoluto: impede que o Minecraft aplique shaders de blur ou sujeira sobre os painéis
-    }
-
-    @Override
-    protected void renderMenuBackground(GuiGraphics g) {
-        // NO-OP absoluto
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        if (this.minecraft != null && this.minecraft.level != null) {
+            this.renderTransparentBackground(graphics);
+        } else {
+            this.renderMenuBackground(graphics);
+        }
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // Fundo padrão
+        int listWidth = (int) (this.width * 0.65);
+        int topY = 36;
+        int bottomY = this.height - 36;
+
+        // Barra superior sólida e barra inferior sólida com divisórias horizontais
+        graphics.fill(0, 0, this.width, topY, 0xF0101010);
+        graphics.fill(0, bottomY, this.width, this.height, 0xF0101010);
+        graphics.fill(0, topY - 1, this.width, topY, 0xFF333333);
+        graphics.fill(0, bottomY, this.width, bottomY + 1, 0xFF333333);
+
+        // Painel esquerdo da lista: preenchimento escuro limpo impedindo vazamento de fundo
+        graphics.fill(8, topY, listWidth, bottomY, 0xEE141414);
+        graphics.renderOutline(8, topY, listWidth - 8, bottomY - topY, 0xFF2A2A2A);
+
+        // Fundo padrão e renderização dos widgets (botões, listWidget, searchBox)
         super.render(graphics, mouseX, mouseY, partialTick);
 
         // Título da Categoria alinhado à direita do botão Voltar (sem sobreposição)
         int titleX = 105;
-        int listWidth = (int) (this.width * 0.65);
         int maxTitleWidth = listWidth - titleX - 8;
         String titleStr = this.category.getTitle().getString();
         if (this.font.width(titleStr) > maxTitleWidth) {
@@ -196,8 +208,6 @@ public class RotaCategoryScreen extends Screen {
         graphics.drawString(this.font, titleStr, titleX, 14, 0xFFFFAA00, false);
 
         // Divisória Vertical entre a Lista e o Painel Inspector
-        int topY = 36;
-        int bottomY = this.height - 36;
         graphics.fill(listWidth + 2, topY, listWidth + 3, bottomY, 0xFF444444);
 
         // Renderiza o Painel Inspector à Direita (~35% da Tela)
@@ -308,8 +318,8 @@ public class RotaCategoryScreen extends Screen {
     }
 
     private void renderInspectorPanel(GuiGraphics graphics, int x, int y, int width, int height, int mouseX, int mouseY) {
-        // Fundo escuro com borda suave na caixa completa
-        graphics.fill(x, y, x + width, y + height, 0xCC111111);
+        // Fundo escuro com borda suave na caixa completa (opaco)
+        graphics.fill(x, y, x + width, y + height, 0xFF181818);
         graphics.renderOutline(x, y, width, height, 0xFF555555);
 
         int innerX = x + 12;
