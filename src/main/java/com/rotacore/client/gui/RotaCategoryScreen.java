@@ -245,11 +245,15 @@ public class RotaCategoryScreen extends Screen {
         }
         int total = 0;
 
-        // Título e espaçamento
-        int titleLinesCount = (this.font != null)
-                ? this.font.split(Component.literal("§6§l" + option.getTitle().getString()), innerWidth).size()
-                : 1;
-        total += titleLinesCount * 12 + 10;
+        boolean hasCustom = option.hasCustomInspectorRenderer();
+
+        if (!hasCustom) {
+            // Título e espaçamento
+            int titleLinesCount = (this.font != null)
+                    ? this.font.split(Component.literal("§6§l" + option.getTitle().getString()), innerWidth).size()
+                    : 1;
+            total += titleLinesCount * 12 + 10;
+        }
 
         // Bloqueio de servidor (se houver)
         boolean canEdit = option.canPlayerEdit(this.minecraft);
@@ -257,32 +261,34 @@ public class RotaCategoryScreen extends Screen {
             total += 20;
         }
 
-        // Descrição
-        String desc = option.getDescription();
-        if (desc != null && !desc.isEmpty()) {
-            int descLinesCount = (this.font != null)
-                    ? this.font.split(Component.literal("§f" + desc), innerWidth).size()
-                    : Math.max(1, (int) Math.ceil((double) desc.length() * 6 / Math.max(1, innerWidth)));
-            total += descLinesCount * 11 + 8;
-        }
+        if (!hasCustom) {
+            // Descrição
+            String desc = option.getDescription();
+            if (desc != null && !desc.isEmpty()) {
+                int descLinesCount = (this.font != null)
+                        ? this.font.split(Component.literal("§f" + desc), innerWidth).size()
+                        : Math.max(1, (int) Math.ceil((double) desc.length() * 6 / Math.max(1, innerWidth)));
+                total += descLinesCount * 11 + 8;
+            }
 
-        // Dicas / Exemplos (omitido por padrao quando redundante ou em opcoes com preview)
-        if (shouldRenderTip(option)) {
-            String tip = option.getExampleTip();
-            int tipLinesCount = (this.font != null)
-                    ? this.font.split(Component.literal("§b" + tip), innerWidth).size()
-                    : Math.max(1, (int) Math.ceil((double) tip.length() * 6 / Math.max(1, innerWidth)));
-            total += tipLinesCount * 11 + 24;
-        }
+            // Dicas / Exemplos (omitido por padrao quando redundante ou em opcoes com preview)
+            if (shouldRenderTip(option)) {
+                String tip = option.getExampleTip();
+                int tipLinesCount = (this.font != null)
+                        ? this.font.split(Component.literal("§b" + tip), innerWidth).size()
+                        : Math.max(1, (int) Math.ceil((double) tip.length() * 6 / Math.max(1, innerWidth)));
+                total += tipLinesCount * 11 + 24;
+            }
 
-        // Padrao recomendado (omitido por padrao quando a opcao ja exibe seu estado nativamente)
-        if (shouldRenderDefaultValue(option)) {
-            String defaultVal = option.getDefaultValueText();
-            String fullDefault = "§7Padrão recomendado: §a" + defaultVal;
-            int defLinesCount = (this.font != null)
-                    ? this.font.split(Component.literal(fullDefault), innerWidth).size()
-                    : 1;
-            total += defLinesCount * 11 + 8;
+            // Padrao recomendado (omitido por padrao quando a opcao ja exibe seu estado nativamente)
+            if (shouldRenderDefaultValue(option)) {
+                String defaultVal = option.getDefaultValueText();
+                String fullDefault = "§7Padrão recomendado: §a" + defaultVal;
+                int defLinesCount = (this.font != null)
+                        ? this.font.split(Component.literal(fullDefault), innerWidth).size()
+                        : 1;
+                total += defLinesCount * 11 + 8;
+            }
         }
 
         // Card de textura
@@ -315,7 +321,7 @@ public class RotaCategoryScreen extends Screen {
         }
 
         // Inspector Customizado Rico (Visualizador 3D, Atributos, etc.)
-        if (option.hasCustomInspectorRenderer()) {
+        if (hasCustom) {
             total += option.getCustomInspectorHeight() + 16;
         }
 
@@ -355,21 +361,25 @@ public class RotaCategoryScreen extends Screen {
         graphics.enableScissor(x + 1, y + 1, x + width - 1, y + height - 1);
 
         int curY = y + 10 - (int) this.inspectorScrollAmount;
+        boolean hasCustom = focusedOption.hasCustomInspectorRenderer();
 
-        // Título da Opção em Destaque (com quebra se for longo)
-        List<FormattedCharSequence> titleLines = this.font.split(
-                Component.literal("§6§l" + focusedOption.getTitle().getString()),
-                innerWidth
-        );
-        for (FormattedCharSequence tLine : titleLines) {
-            graphics.drawString(this.font, tLine, innerX, curY, 0xFFFFAA00, false);
-            curY += 12;
+        if (!hasCustom) {
+            // Título da Opção em Destaque (com quebra se for longo)
+            List<FormattedCharSequence> titleLines = this.font.split(
+                    Component.literal("§6§l" + focusedOption.getTitle().getString()),
+                    innerWidth
+            );
+            for (FormattedCharSequence tLine : titleLines) {
+                graphics.drawString(this.font, tLine, innerX, curY, 0xFFFFAA00, false);
+                curY += 12;
+            }
+            graphics.fill(innerX, curY + 2, innerX + innerWidth, curY + 3, 0xFF555555);
+            curY += 8;
         }
-        graphics.fill(innerX, curY + 2, innerX + innerWidth, curY + 3, 0xFF555555);
 
         // Aviso de Bloqueio por Servidor se o jogador não puder editar
         boolean canEdit = focusedOption.canPlayerEdit(this.minecraft);
-        int textY = curY + 8;
+        int textY = curY;
         if (!canEdit) {
             graphics.fill(innerX - 2, textY - 2, innerX + innerWidth + 2, textY + 14, 0x44CC2222);
             graphics.renderOutline(innerX - 2, textY - 2, innerWidth + 4, 16, 0xFFAA3333);
@@ -377,55 +387,56 @@ public class RotaCategoryScreen extends Screen {
             textY += 20;
         }
 
-        // Descrição Detalhada com Quebra Automática de Linha
-        String desc = focusedOption.getDescription();
-        if (desc != null && !desc.isEmpty()) {
-            List<FormattedCharSequence> descLines = this.font.split(
-                    Component.literal("§f" + desc),
-                    innerWidth
-            );
-            for (FormattedCharSequence line : descLines) {
-                graphics.drawString(this.font, line, innerX, textY, 0xFFEEEEEE, false);
-                textY += 11;
+        if (!hasCustom) {
+            // Descrição Detalhada com Quebra Automática de Linha
+            String desc = focusedOption.getDescription();
+            if (desc != null && !desc.isEmpty()) {
+                List<FormattedCharSequence> descLines = this.font.split(
+                        Component.literal("§f" + desc),
+                        innerWidth
+                );
+                for (FormattedCharSequence line : descLines) {
+                    graphics.drawString(this.font, line, innerX, textY, 0xFFEEEEEE, false);
+                    textY += 11;
+                }
             }
-        }
 
-        textY += 8;
-
-        // Bloco de Dicas / Exemplos Praticos (renderizado apenas se houver dica customizada relevante)
-        if (shouldRenderTip(focusedOption)) {
-            graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
-            textY += 4;
-            graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
-            textY += 12;
-
-            List<FormattedCharSequence> tipLines = this.font.split(
-                    Component.literal("§b" + focusedOption.getExampleTip()),
-                    innerWidth
-            );
-            for (FormattedCharSequence line : tipLines) {
-                graphics.drawString(this.font, line, innerX, textY, 0xFF88DDFF, false);
-                textY += 11;
-            }
             textY += 8;
-        }
 
-        // Valor Padrao (apenas quando expressamente solicitado)
-        if (shouldRenderDefaultValue(focusedOption)) {
-            List<FormattedCharSequence> defaultLines = this.font.split(
-                    Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
-                    innerWidth
-            );
-            for (FormattedCharSequence line : defaultLines) {
-                graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
-                textY += 11;
+            // Bloco de Dicas / Exemplos Praticos (renderizado apenas se houver dica customizada relevante)
+            if (shouldRenderTip(focusedOption)) {
+                graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, 0xFF333333);
+                textY += 4;
+                graphics.drawString(this.font, "§e§lDica / Exemplo:", innerX, textY, 0xFFFFAA00, false);
+                textY += 12;
+
+                List<FormattedCharSequence> tipLines = this.font.split(
+                        Component.literal("§b" + focusedOption.getExampleTip()),
+                        innerWidth
+                );
+                for (FormattedCharSequence line : tipLines) {
+                    graphics.drawString(this.font, line, innerX, textY, 0xFF88DDFF, false);
+                    textY += 11;
+                }
+                textY += 8;
             }
-            textY += 8;
+
+            // Valor Padrao (apenas quando expressamente solicitado)
+            if (shouldRenderDefaultValue(focusedOption)) {
+                List<FormattedCharSequence> defaultLines = this.font.split(
+                        Component.literal("§7Padrão recomendado: §a" + focusedOption.getDefaultValueText()),
+                        innerWidth
+                );
+                for (FormattedCharSequence line : defaultLines) {
+                    graphics.drawString(this.font, line, innerX, textY, 0xFFAAAAAA, false);
+                    textY += 11;
+                }
+                textY += 8;
+            }
         }
 
         // Inspector Customizado Rico (ex: Visualizador 3D, Graficos, Atributos de Criaturas, etc.)
-        if (focusedOption.hasCustomInspectorRenderer()) {
-            textY += 6;
+        if (hasCustom) {
             int customH = focusedOption.getCustomInspectorHeight();
             try {
                 focusedOption.getCustomInspectorRenderer().render(graphics, innerX, textY, innerWidth, customH, partialTick);

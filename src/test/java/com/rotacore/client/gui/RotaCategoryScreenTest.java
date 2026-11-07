@@ -226,4 +226,25 @@ public class RotaCategoryScreenTest {
         double maxScroll = RotaCategoryScreen.calculateMaxScroll(contentHeight, commonVisibleHeight);
         assertEquals(0.0, maxScroll, 0.001, "Card de textura e cabecalho devem caber perfeitamente sem scroll (maxScroll == 0)");
     }
+
+    @Test
+    public void testCustomInspectorSuppressesGenericHeaderAndDescription() {
+        RotaConfigOption optWithCustom = RotaConfigOption.booleanToggle(
+                Component.literal("Criatura Gigante"),
+                "Descricao muito longa que nao deve ser duplicada no inspector customizado",
+                "Dica irrelevante",
+                true,
+                () -> true,
+                v -> {}
+        ).withCustomInspector((graphics, x, y, w, h, pt) -> {}, 180);
+
+        RotaCategory category = new RotaCategory("test_custom", Component.literal("Bestiario"), "Desc", () -> List.of(optWithCustom));
+        RotaCategoryScreen screen = new RotaCategoryScreen(null, category);
+
+        int contentHeight = screen.calculateInspectorContentHeight(optWithCustom, 200);
+
+        // Deve conter apenas a altura do custom inspector (180) + margem (16), totalizando 196
+        // Se somasse o titulo e a descricao generica, passaria de 230
+        assertEquals(196, contentHeight, "Opcao com custom inspector deve conter estritamente a altura customizada sem duplicar titulo ou descricao");
+    }
 }
