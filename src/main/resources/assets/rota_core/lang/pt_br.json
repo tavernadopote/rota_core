@@ -19,5 +19,8 @@
   "gui.rota_core.anchor.bottom_left": "Inferior Esquerdo",
   "gui.rota_core.anchor.bottom_center": "Inferior Central",
   "gui.rota_core.anchor.bottom_right": "Inferior Direito",
-  "gui.rota_core.anchor.custom": "Personalizado"
+  "gui.rota_core.anchor.custom": "Personalizado",
+  "rota_core.config.player_color": "Cor de Identidade do Jogador",
+  "rota_core.config.player_color.desc": "Define a cor visual de identificação do jogador para marcadores do mapa, silhueta holográfica da luneta e barras diegéticas.",
+  "rota_core.config.player_color.tip": "Opção cosmética de cliente. Escolha entre as 16 cores clássicas do Minecraft."
 }

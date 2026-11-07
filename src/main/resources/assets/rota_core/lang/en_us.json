@@ -19,5 +19,8 @@
   "gui.rota_core.anchor.bottom_left": "Bottom Left",
   "gui.rota_core.anchor.bottom_center": "Bottom Center",
   "gui.rota_core.anchor.bottom_right": "Bottom Right",
-  "gui.rota_core.anchor.custom": "Custom"
+  "gui.rota_core.anchor.custom": "Custom",
+  "rota_core.config.player_color": "Player Identity Color",
+  "rota_core.config.player_color.desc": "Defines the player identity visual color for map markers, spyglass holographic silhouettes, and diegetic bars.",
+  "rota_core.config.player_color.tip": "Client cosmetic option. Choose among the 16 classic Minecraft dye colors."
 }
