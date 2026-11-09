@@ -77,6 +77,15 @@ public class RotaHudRegistryTest {
     }
 
     @Test
+    public void testPreviewModeDefaults() {
+        DummyHudElement elem = new DummyHudElement("test_mod:preview", false);
+        assertFalse(elem.isPreviewMode());
+        assertDoesNotThrow(() -> elem.setPreviewMode(true));
+        // O metodo default nao altera estado interno se nao sobrescrito
+        assertFalse(elem.isPreviewMode());
+    }
+
+    @Test
     public void testNullSafety() {
         assertDoesNotThrow(() -> RotaHudRegistry.register(null));
         assertDoesNotThrow(() -> RotaHudRegistry.unregister(null));

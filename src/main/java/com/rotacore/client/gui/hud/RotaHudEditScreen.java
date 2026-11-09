@@ -60,6 +60,10 @@ public class RotaHudEditScreen extends Screen {
         this.items.clear();
         this.activeDragged = null;
 
+        for (IRotaHudElement elem : RotaHudRegistry.getAllElements()) {
+            elem.setPreviewMode(true);
+        }
+
         RotaCoreConfig config = RotaCore.getConfig();
         Map<String, RotaHudLayoutManager.HudLayoutResult> layout = RotaHudLayoutManager.calculateAllLayout(this.width, this.height);
 
@@ -289,7 +293,18 @@ public class RotaHudEditScreen extends Screen {
     }
 
     @Override
+    public void removed() {
+        super.removed();
+        for (IRotaHudElement elem : RotaHudRegistry.getAllElements()) {
+            elem.setPreviewMode(false);
+        }
+    }
+
+    @Override
     public void onClose() {
+        for (IRotaHudElement elem : RotaHudRegistry.getAllElements()) {
+            elem.setPreviewMode(false);
+        }
         if (this.minecraft != null) {
             this.minecraft.setScreen(this.parentScreen);
         }

@@ -83,4 +83,15 @@ public interface IRotaHudElement {
     default boolean isMovable() {
         return true;
     }
+
+    /**
+     * Determina se o elemento está em modo de pré-visualização (ex: durante edição no RotaHudEditScreen).
+     * Permite que elementos condicionais (como o HUD da luneta) exibam dados simulados durante o reposicionamento.
+     */
+    default boolean isPreviewMode() {
+        return false;
+    }
+
+    default void setPreviewMode(boolean preview) {
+    }
 }
