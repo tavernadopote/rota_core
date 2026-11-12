@@ -1,8 +1,8 @@
 # Rota Core
 
-**Rota Core** é a biblioteca central, leve e nativa da suíte de mods **Rota Mods** (criada por Leandro / Taverna do Pote).
+**Rota Core** é a biblioteca central, leve e nativa da suíte de mods **Rota Mods** (criada por Leandro / Rota Mods).
 
-Desenvolvida especialmente para **Minecraft 1.21.1 (NeoForge)**, ela substitui bibliotecas volumosas e externas (como Cloth Config) por uma solução 100% nativa, de alta performance e com identidade visual única.
+Desenvolvida especialmente para **Minecraft 1.21.1 (NeoForge)**, ela substitui bibliotecas volumosas e externas por uma solução 100% nativa, de alta performance e com identidade visual única.
 
 ---
 
@@ -10,12 +10,14 @@ Desenvolvida especialmente para **Minecraft 1.21.1 (NeoForge)**, ela substitui b
 
 - **Zoneamento Macro-Regional e Orquestração de Mundo (`RegionalGrid`)**: Particionamento determinístico $O(1)$ do mundo em células regionais que ditam a localização lógica e harmônica de vilas e postos avançados.
 - **Classificação Universal de Estruturas (`StructureZoneRegistry`)**: Compatibilidade nativa com tags oficiais do Minecraft (`#minecraft:village`) e mods de estruturas como ChoiceTheorem's Overhauled Village (CTOV), Towns and Towers, etc.
-- **Hub Universal de Mods (Rota Hub)**: Um painel central com abas que unifica a navegação e configuração de todos os mods da suíte (`Rota Roads`, `Rota Quests`, etc.).
+- **Hub Universal de Mods (Rota Hub)**: Um painel central com abas que unifica a navegação e configuração de todos os mods da suíte (`Rota Roads`, `Rota Questbook`, etc.).
 - **Integração no Menu de Pausa (ESC)**: Botão estilizado `Rota Mods` inserido de forma limpa no menu de pausa do jogador e tecla de atalho configurável (`O`).
-- **Widgets Visuais Nativos**: Botões com hover dourado (`RotaButton`), seletores numéricos (`RotaSlider`), interruptores toggle modernos (`RotaSwitch`) e abas superiores (`RotaTabButton`).
-- **Layout Inspector de 2 Colunas**: Tela com controles roláveis à esquerda e painel de inspeção à direita com descrições detalhadas, valores padrão recomendados, dicas em tempo real e barra de busca instantânea.
+- **Widgets Visuais Nativos**: Botões com hover dourado (`RotaButton`), seletores numéricos (`RotaSlider`), interruptores toggle modernos (`RotaSwitch`), abas superiores (`RotaTabButton`), campos de texto de linha única (`STRING_INPUT`) e multilinhas (`MULTILINE_STRING_INPUT`).
+- **Arquitetura de Modais Ricos (Z=400)**: Modais isolados com tratamento de desfoque de fundo e foco de teclado (`ConfirmModalWidget`, `ItemCatalogModalWidget`, `OptionPickerModalWidget`).
+- **Layout Inspector de 2 Colunas e Custom Inspector**: Tela com controles roláveis à esquerda e painel de inspeção à direita com descrições detalhadas, suporte a delegação gráfica personalizada via `CustomInspectorRenderer` e busca instantânea.
 - **Gerenciador de Configuração JSON Sem Dependências**: Serialização e desserialização automática em `config/<mod_id>.json` utilizando o GSON nativo do Minecraft.
-- **Gerenciador Central de HUD e Editor Sandbox**: Barramento unificado para registro de elementos na tela com layout automático, empilhamento anti-colisão inteligente e editor interativo de arrastar e soltar (drag & drop).
+- **Gerenciador Central de HUD e Editor Sandbox**: Barramento unificado para registro de elementos na tela com layout automático, empilhamento anti-colisão inteligente, modo preview representativo no editor (`renderPreview`) e editor interativo de arrastar e soltar (`RotaHudEditScreen`).
+- **Subsistema de Identidade de Jogador (`RotaPlayerIdentity`)**: Persistência determinística em arquivo JSON com vinculação nativa às 16 cores de corante do Minecraft.
 - **Sistema de Nomes de Vilas por DataPacks e i18n**: Resolução determinística e multilíngue de nomes de assentamentos com hierarquia tripla de prioridade (Waystones, DataPacks e Procedural Nativo).
 - **Vocação Comercial de Assentamentos (`SettlementCommercialData`)**: Análise de postos de trabalho de aldeões e geração de perfis econômicos para mapas e interfaces.
 - **Governança de Configurações (Cliente vs Servidor / Admin)**: Separação formal entre preferências cosméticas do cliente e opções de impacto no mundo, com travas de segurança e desativação visual automática para jogadores sem privilégio de operador em servidores multiplayer.
@@ -49,51 +51,78 @@ public class MyCompassHudElement implements IRotaHudElement {
     }
 
     @Override
-    public int getWidth() { return 64; }
+    public int getWidth() {
+        return 64;
+    }
 
     @Override
-    public int getHeight() { return 64; }
+    public int getHeight() {
+        return 64;
+    }
 
     @Override
-    public boolean isVisible() { return true; }
+    public void render(GuiGraphics graphics, float partialTick, int screenWidth, int screenHeight) {
+        // Renderização em jogo normal
+    }
 
     @Override
-    public void render(GuiGraphics graphics, float partialTick) {
-        // Renderização customizada do widget
+    public void renderPreview(GuiGraphics graphics, int screenWidth, int screenHeight) {
+        // Renderização representativa quando dentro do RotaHudEditScreen
     }
 }
+```
 
-// Registro no RotaHudRegistry:
+Registre o elemento na inicialização do cliente:
+
+```java
 RotaHudRegistry.register(new MyCompassHudElement());
 ```
 
-### Editor Interativo Sandbox
+---
 
-O jogador pode acessar a tela de edição visual (`RotaHudEditScreen`) pelo Rota Hub ou por atalho configurado. No editor:
-- Os elementos são exibidos com bordas delimitadoras interativas.
-- O jogador pode arrastar e soltar os widgets livremente com o mouse ou encaixá-los em âncoras pré-definidas (cantos e laterais da tela).
-- O gerenciador `RotaHudLayoutManager` aplica empilhamento anti-colisão automático para impedir sobreposições.
-- As posições personalizadas são salvas automaticamente em disco no arquivo de configuração do Rota Core.
+## Arquitetura de Modais e Entradas Ricas
+
+O Rota Core disponibiliza componentes para criação de interfaces sofisticadas:
+
+### Modais Ricos (Z=400)
+- **ConfirmModalWidget**: Exibe caixa de diálogo para confirmações de ações com botões de confirmar e cancelar.
+- **ItemCatalogModalWidget**: Catálogo de itens completo com barra de pesquisa instantânea e rolagem contínua para seleção diegética.
+- **OptionPickerModalWidget**: Seletor modal para enumerações e listas de opções.
+
+### Tipos de Entrada em RotaConfigEntry
+- `ITEM_ENTRY`: Linha de configuração com clique direto para seleção de item através do `ItemCatalogModalWidget`.
+- `STRING_INPUT`: Campo de texto de linha única com validação em tempo real.
+- `MULTILINE_STRING_INPUT`: Campo de texto multilinhas com quebra automática e suporte a descrições longas.
 
 ---
 
-## Sistema de Nomes de Vilas e DataPacks
+## Renderizador de Inspector Customizado (`CustomInspectorRenderer`)
 
-O Rota Core inclui um carregador automático de pacotes de nomes de vilas que escuta a pasta de DataPacks do mundo.
+Mods satélites podem customizar totalmente o painel direito de inspeção em `RotaCategoryScreen`:
 
-### Hierarquia de Resolução
+```java
+category.setCustomInspectorRenderer((graphics, mouseX, mouseY, panelX, panelY, panelWidth, panelHeight) -> {
+    // Desenha diagramas, cartões visuais ou pré-visualizações ricas
+});
+```
 
-Ao identificar uma vila ou assentamento, o serviço `SettlementNamingService` segue a seguinte prioridade estrita:
-1. **Prioridade 1 (Waystones)**: Se o mod Waystones estiver instalado e uma waystone estiver presente dentro do perímetro urbano do assentamento, o nome oficial da waystone é adotado.
-2. **Prioridade 2 (DataPacks - Coordenadas Específicas)**: Nomes cadastrados para coordenadas `x,z` específicas via DataPack.
-3. **Prioridade 3 (Gerador Procedural Nativo)**: Geração determinística $O(1)$ baseada na semente mundial, coordenadas centrais e bioma ou cultura da vila.
+Quando um `CustomInspectorRenderer` é registrado, o cabeçalho genérico e a descrição padrão de categoria são automaticamente suprimidos para dar controle visual absoluto ao mod satélite.
 
-### Tutorial de Criação de DataPack de Nomes
+---
 
-Crie o arquivo JSON dentro do seu DataPack no caminho:
-`data/<namespace>/rota_core/village_names/<cultura>.json`
+## Identidade de Jogador (`RotaPlayerIdentity`)
 
-Exemplo para uma cultura nórdica/taiga (`taiga.json` ou `cultura_nordica.json`):
+O subsistema `RotaPlayerIdentity` permite associar identificadores e preferências de cores aos jogadores:
+- Armazenamento determinístico em JSON local (`config/rota_identity.json`).
+- Suporte a 16 cores de corante do Minecraft Vanilla (`DyeColor`).
+
+---
+
+## Sistema de Nomes de Vilas por DataPacks
+
+O Rota Core inclui um sistema completo de nomes procedurais e determinísticos para vilas e assentamentos.
+
+### Estrutura de Arquivo de Nomes de Vilas (`data/<namespace>/settlement_names/<cultura>.json`)
 
 ```json
 {
@@ -120,28 +149,17 @@ Exemplo para uma cultura nórdica/taiga (`taiga.json` ou `cultura_nordica.json`)
 }
 ```
 
-#### Campos do Arquivo JSON:
-- `replace` (booleano): se `true`, substitui completamente quaisquer listas carregadas anteriormente para essa cultura. Se `false`, mescla adicionando novos nomes sem repetições.
-- `culture` (string): identificador da cultura ou bioma (`plains`, `desert`, `savanna`, `taiga`, `snowy` ou identificador customizado).
-- `prefixes` (lista de strings): prefixos procedurais.
-- `suffixes` (lista de strings): sufixos procedurais (podem iniciar com hífen como `"-gard"` ou minúsculas como `"val"`).
-- `unique_names` (lista de strings): nomes únicos completos sorteados deterministicamente com probabilidade balanceada.
-- `specific_names` (mapa `"X,Z": "Nome"`): atribui nomes fixos e específicos para coordenadas centrais exatas de vilas.
-- `translations` (mapa de dicionários por código de idioma): fornece traduções automáticas para múltiplos idiomas com suporte a fallback ordenado (`pt_br`, `en_us`, etc.).
-
 ---
 
 ## Vocação Comercial e Econômica (`SettlementCommercialData`)
 
-O Rota Core analisa os blocos de trabalho de aldeões nos assentamentos (composteiras, fornalhas de fusão, bancadas de ferraria, púlpitos, barris, teares, pedreiros, suportes de poções, etc.) e classifica a vila em vocações econômicas:
+O Rota Core analisa os blocos de trabalho de aldeões nos assentamentos e classifica a vila em vocações econômicas:
 - **Agropecuária** (`AGRICULTURE`)
 - **Metalurgia e Armaria** (`METALLURGY`)
 - **Pescaria e Navegação** (`FISHING`)
 - **Alquimia e Conhecimento** (`SCHOLARSHIP`)
 - **Manufatura e Alvenaria** (`CRAFTING`)
 - **Comércio Geral** (`GENERAL_COMMERCE`)
-
-Esses dados econômicos são persistidos na estrutura `SettlementZone` via tags NBT e integrados ao tooltip de visualização cartográfica no mapa.
 
 ---
 
@@ -158,7 +176,7 @@ public class MyModModule implements RotaModule {
     public Component getDisplayName() { return Component.literal("Meu Mod Rota"); }
 
     @Override
-    public String getVersion() { return "1.0.0"; }
+    public String getVersion() { return "1.4.0"; }
 
     @Override
     public Component getDescription() { return Component.literal("Descrição do que meu mod faz."); }
@@ -175,8 +193,6 @@ public class MyModModule implements RotaModule {
 ```java
 RotaCoreRegistry.register(new MyModModule());
 ```
-
-Pronto! Seu mod já aparecerá automaticamente com aba própria e cartão no Rota Hub.
 
 ---
 

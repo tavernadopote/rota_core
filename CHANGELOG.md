@@ -1,3 +1,10 @@
+# Version v1.4.0 - Rich Modal System, Custom Inspector Renderer, Player Identity & HUD Preview
+
+## Overview
+Version **v1.4.0** of **Rota Core** introduces extensive architectural additions to the user interface, configuration framework, HUD subsystem, and multiplayer identity services. This release stabilizes rich modal overlays, provides dedicated item pickers and multi-line inputs, enhances HUD element previewing in editor mode, and introduces player identity persistence.
+
+---
+
 # Version v1.15.0 - Inspector Redundant Tip Omission & Texture Preview Fit
 
 ## Overview
