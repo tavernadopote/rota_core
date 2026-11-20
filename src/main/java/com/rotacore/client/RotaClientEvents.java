@@ -1,0 +1,153 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.Minecraft
+ *  net.minecraft.client.gui.components.Button
+ *  net.minecraft.client.gui.components.events.GuiEventListener
+ *  net.minecraft.client.gui.screens.PauseScreen
+ *  net.minecraft.client.gui.screens.Screen
+ *  net.minecraft.client.gui.screens.options.OptionsScreen
+ *  net.minecraft.network.chat.Component
+ *  net.neoforged.bus.api.SubscribeEvent
+ *  net.neoforged.neoforge.client.event.ClientTickEvent$Post
+ *  net.neoforged.neoforge.client.event.RenderGuiEvent$Post
+ *  net.neoforged.neoforge.client.event.ScreenEvent$Init$Post
+ */
+package com.rotacore.client;
+
+import com.rotacore.RotaCore;
+import com.rotacore.api.RotaCoreRegistry;
+import com.rotacore.api.RotaModule;
+import com.rotacore.client.RotaKeyBindings;
+import com.rotacore.client.gui.RotaCoreModulesScreen;
+import com.rotacore.client.gui.hud.RotaHudEditScreen;
+import com.rotacore.client.gui.hud.RotaHudLayoutManager;
+import com.rotacore.client.gui.widget.RotaButton;
+import com.rotacore.config.RotaCoreConfig;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.network.chat.Component;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+
+public class RotaClientEvents {
+    @SubscribeEvent
+    public static void onScreenInit(ScreenEvent.Init.Post event) {
+        Screen screen = event.getScreen();
+        if (screen instanceof PauseScreen) {
+            RotaClientEvents.handlePauseScreenInit(screen, event);
+        }
+        if (screen instanceof OptionsScreen) {
+            OptionsScreen optionsScreen = (OptionsScreen)screen;
+            RotaClientEvents.handleOptionsScreenInit(optionsScreen, event);
+        }
+    }
+
+    private static void handlePauseScreenInit(Screen screen, ScreenEvent.Init.Post event) {
+        RotaCoreConfig config = RotaCore.getConfig();
+        if (!config.showPauseMenuButton) {
+            return;
+        }
+        int btnW = 90;
+        int btnH = 20;
+        int x = screen.width - btnW - 10;
+        int y = 10;
+        RotaButton hubBtn = new RotaButton(x, y, btnW, btnH, (Component)Component.literal((String)"\u00a76Rota Mods"), btn -> Minecraft.getInstance().setScreen((Screen)new RotaCoreModulesScreen(screen)));
+        hubBtn.setAccent(true);
+        event.addListener((GuiEventListener)hubBtn);
+    }
+
+    private static void handleOptionsScreenInit(OptionsScreen optionsScreen, ScreenEvent.Init.Post event) {
+        RotaCoreConfig config = RotaCore.getConfig();
+        List<RotaModule> modules = RotaCoreRegistry.getAllModules();
+        ArrayList<RotaModule> activeMods = new ArrayList<RotaModule>();
+        for (RotaModule mod : modules) {
+            if (!config.isModuleEnabledInOptions(mod.getId())) continue;
+            activeMods.add(mod);
+        }
+        boolean showHub = config.showHubInOptionsScreen;
+        if (activeMods.isEmpty() && !showHub) {
+            return;
+        }
+        int maxGridY = -1;
+        Button doneBtn = null;
+        for (Object child : optionsScreen.children()) {
+            if (!(child instanceof Button)) continue;
+            Button btn2 = (Button)child;
+            if (btn2.getWidth() <= 160) {
+                maxGridY = Math.max(maxGridY, btn2.getY());
+                continue;
+            }
+            if (btn2.getWidth() < 190) continue;
+            doneBtn = btn2;
+        }
+        if (maxGridY == -1) {
+            maxGridY = optionsScreen.height / 2 + 48;
+        }
+        ArrayList<Button> buttonsToAdd = new ArrayList<Button>();
+        for (RotaModule mod : activeMods) {
+            Object title = mod.getDisplayName().getString();
+            if (!((String)title).endsWith("...")) {
+                title = (String)title + "...";
+            }
+            Button modBtn = Button.builder((Component)Component.literal((String)title), btn -> Minecraft.getInstance().setScreen(mod.createConfigScreen((Screen)optionsScreen))).bounds(0, 0, 150, 20).build();
+            buttonsToAdd.add(modBtn);
+        }
+        if (showHub) {
+            Button hubBtn = Button.builder((Component)Component.literal((String)"Rota Mods Hub..."), btn -> Minecraft.getInstance().setScreen((Screen)new RotaCoreModulesScreen((Screen)optionsScreen))).bounds(0, 0, 150, 20).build();
+            buttonsToAdd.add(hubBtn);
+        }
+        int centerX = optionsScreen.width / 2;
+        int startRowY = maxGridY + 24;
+        if (buttonsToAdd.size() == 1) {
+            Button single = (Button)buttonsToAdd.get(0);
+            single.setX(centerX - 75);
+            single.setY(startRowY);
+            event.addListener((GuiEventListener)single);
+        } else {
+            for (int i = 0; i < buttonsToAdd.size(); ++i) {
+                int col = i % 2;
+                int row = i / 2;
+                int x = col == 0 ? centerX - 155 : centerX + 5;
+                int y = startRowY + row * 24;
+                Button btn3 = (Button)buttonsToAdd.get(i);
+                btn3.setX(x);
+                btn3.setY(y);
+                event.addListener((GuiEventListener)btn3);
+            }
+        }
+        int totalRows = (buttonsToAdd.size() + 1) / 2;
+        int lastRowBottom = startRowY + totalRows * 24;
+        if (doneBtn != null && doneBtn.getY() < lastRowBottom + 4) {
+            int newDoneY = Math.min(optionsScreen.height - 26, lastRowBottom + 6);
+            doneBtn.setY(newDoneY);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Post event) {
+        Minecraft mc = Minecraft.getInstance();
+        while (RotaKeyBindings.OPEN_HUB.consumeClick()) {
+            mc.setScreen((Screen)new RotaCoreModulesScreen(mc.screen));
+        }
+        while (RotaKeyBindings.OPEN_HUD_EDITOR.consumeClick()) {
+            mc.setScreen((Screen)new RotaHudEditScreen(mc.screen));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRenderGui(RenderGuiEvent.Post event) {
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        RotaHudLayoutManager.renderAll(event.getGuiGraphics(), partialTick);
+    }
+}
+

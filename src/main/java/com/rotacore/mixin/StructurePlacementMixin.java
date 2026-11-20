@@ -1,0 +1,45 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.world.level.chunk.ChunkGeneratorStructureState
+ *  net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+ */
+package com.rotacore.mixin;
+
+import com.rotacore.RotaCore;
+import com.rotacore.config.RotaCoreConfig;
+import com.rotacore.world.zoning.RegionalGrid;
+import com.rotacore.world.zoning.StructureZoneRegistry;
+import com.rotacore.world.zoning.ZoneType;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(value={StructurePlacement.class})
+public class StructurePlacementMixin {
+    @Inject(method={"isStructureChunk"}, at={@At(value="HEAD")}, cancellable=true)
+    private void rota$interceptStructureChunk(ChunkGeneratorStructureState structureState, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
+        RotaCoreConfig config = RotaCore.getConfig();
+        if (config == null || !config.enableControlledWorldgen) {
+            return;
+        }
+        StructurePlacement placement = (StructurePlacement)this;
+        ZoneType zoneType = StructureZoneRegistry.getZoneType(structureState, placement);
+        if (zoneType == ZoneType.SETTLEMENT) {
+            boolean isVillageChunk = RegionalGrid.isCandidateVillageChunk(structureState.getLevelSeed(), chunkX, chunkZ, config);
+            cir.setReturnValue((Object)isVillageChunk);
+        } else if (zoneType == ZoneType.OUTPOST) {
+            boolean isOutpostChunk = RegionalGrid.isCandidateOutpostChunk(structureState.getLevelSeed(), chunkX, chunkZ, config);
+            cir.setReturnValue((Object)isOutpostChunk);
+        }
+    }
+}
+

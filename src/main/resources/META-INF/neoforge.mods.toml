@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+issueTrackerURL="https://github.com/tavernadopote/rota_core/issues"
+
+[[mixins]]
+config = "rota_core.mixins.json"
+
+[[mods]]
+modId="rota_core"
+version="1.5.0-dev.1"
+displayName="Rota Core"
+description='''Biblioteca central, hub de interface universal e arquitetura compartilhada para a suite Rota Mods.'''
+authors="Leo"
+
+[[dependencies.rota_core]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.rota_core]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.1,1.22)"
+    ordering="NONE"
+    side="BOTH"
