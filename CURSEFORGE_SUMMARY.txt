@@ -1,0 +1,2 @@
+A lightweight, native core library and unified multi-tabbed configuration hub for the Rota Mods ecosystem on NeoForge.
+Uma biblioteca base leve e nativa com hub unificado de configurações em abas para o ecossistema Rota Mods no NeoForge.
