@@ -282,44 +282,53 @@ public class SettlementZone {
         struct = struct == null ? urbanCore.expanded(16) : struct.union(urbanCore);
 
         Map<Long, SettlementPortal> portalMap = new LinkedHashMap<>();
+        int minDistance = 8;
 
-        if (streetEndpoints != null && !streetEndpoints.isEmpty()) {
-            for (BlockPos ep : streetEndpoints) {
-                if (ep == null) continue;
-                BlockPos snapped = snapToPerimeter(ep, approach);
-                SettlementPortalType type = (isWater != null && isWater.test(snapped.getX(), snapped.getZ()))
-                        ? SettlementPortalType.MARITIME
-                        : SettlementPortalType.TERRESTRIAL;
-                long key = BlockPos.asLong(snapped.getX(), 0, snapped.getZ());
-                portalMap.putIfAbsent(key, new SettlementPortal(snapped, type));
+        List<Integer> northXList = new ArrayList<>();
+        List<Integer> southXList = new ArrayList<>();
+        List<Integer> westZList = new ArrayList<>();
+        List<Integer> eastZList = new ArrayList<>();
+
+        for (SettlementBounds pb : allPieces) {
+            // Check North edge contact
+            if (pb.minZ() <= urbanCore.minZ() + 1) {
+                int cx = (pb.minX() + pb.maxX()) / 2;
+                if (isFarEnough(cx, northXList, minDistance)) {
+                    northXList.add(cx);
+                    BlockPos pos = new BlockPos(cx, pb.minY(), approach.minZ());
+                    addPortalCandidate(portalMap, pos, isWater);
+                }
             }
-        }
-
-        if (streetBounds != null && !streetBounds.isEmpty()) {
-            for (SettlementBounds sb : streetBounds) {
-                int cx = (sb.minX() + sb.maxX()) / 2;
-                int cz = (sb.minZ() + sb.maxZ()) / 2;
-                int cy = sb.minY();
-                if (approach.expanded(2).contains2D(cx, cz)) {
-                    BlockPos candidate = snapToPerimeter(new BlockPos(cx, cy, cz), approach);
-                    SettlementPortalType type = (isWater != null && isWater.test(candidate.getX(), candidate.getZ()))
-                            ? SettlementPortalType.MARITIME
-                            : SettlementPortalType.TERRESTRIAL;
-                    long key = BlockPos.asLong(candidate.getX(), 0, candidate.getZ());
-                    portalMap.putIfAbsent(key, new SettlementPortal(candidate, type));
+            // Check South edge contact
+            if (pb.maxZ() >= urbanCore.maxZ() - 1) {
+                int cx = (pb.minX() + pb.maxX()) / 2;
+                if (isFarEnough(cx, southXList, minDistance)) {
+                    southXList.add(cx);
+                    BlockPos pos = new BlockPos(cx, pb.minY(), approach.maxZ());
+                    addPortalCandidate(portalMap, pos, isWater);
+                }
+            }
+            // Check West edge contact
+            if (pb.minX() <= urbanCore.minX() + 1) {
+                int cz = (pb.minZ() + pb.maxZ()) / 2;
+                if (isFarEnough(cz, westZList, minDistance)) {
+                    westZList.add(cz);
+                    BlockPos pos = new BlockPos(approach.minX(), pb.minY(), cz);
+                    addPortalCandidate(portalMap, pos, isWater);
+                }
+            }
+            // Check East edge contact
+            if (pb.maxX() >= urbanCore.maxX() - 1) {
+                int cz = (pb.minZ() + pb.maxZ()) / 2;
+                if (isFarEnough(cz, eastZList, minDistance)) {
+                    eastZList.add(cz);
+                    BlockPos pos = new BlockPos(approach.maxX(), pb.minY(), cz);
+                    addPortalCandidate(portalMap, pos, isWater);
                 }
             }
         }
 
-        boolean hasTerrestrial = false;
-        for (SettlementPortal portal : portalMap.values()) {
-            if (portal.type() == SettlementPortalType.TERRESTRIAL) {
-                hasTerrestrial = true;
-                break;
-            }
-        }
-
-        if (!hasTerrestrial) {
+        if (portalMap.isEmpty()) {
             int midX = (approach.minX() + approach.maxX()) / 2;
             int midZ = (approach.minZ() + approach.maxZ()) / 2;
             int y = urbanCore.minY();
@@ -330,15 +339,28 @@ public class SettlementZone {
                     new BlockPos(approach.maxX(), y, midZ)
             };
             for (BlockPos cp : cardinals) {
-                SettlementPortalType type = (isWater != null && isWater.test(cp.getX(), cp.getZ()))
-                        ? SettlementPortalType.MARITIME
-                        : SettlementPortalType.TERRESTRIAL;
-                long key = BlockPos.asLong(cp.getX(), 0, cp.getZ());
-                portalMap.putIfAbsent(key, new SettlementPortal(cp, type));
+                addPortalCandidate(portalMap, cp, isWater);
             }
         }
 
         return new SettlementZone(struct, urbanCore, approach, allPieces, streetEndpoints, "", null, portalMap.values());
+    }
+
+    private static boolean isFarEnough(int val, List<Integer> list, int minDist) {
+        for (int existing : list) {
+            if (Math.abs(existing - val) < minDist) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void addPortalCandidate(Map<Long, SettlementPortal> portalMap, BlockPos pos, BiPredicate<Integer, Integer> isWater) {
+        SettlementPortalType type = (isWater != null && isWater.test(pos.getX(), pos.getZ()))
+                ? SettlementPortalType.MARITIME
+                : SettlementPortalType.TERRESTRIAL;
+        long key = BlockPos.asLong(pos.getX(), 0, pos.getZ());
+        portalMap.putIfAbsent(key, new SettlementPortal(pos, type));
     }
 
     private static BlockPos snapToPerimeter(BlockPos pos, SettlementBounds perimeter) {
