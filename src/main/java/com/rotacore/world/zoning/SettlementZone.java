@@ -244,6 +244,18 @@ public class SettlementZone {
             int approachMargin,
             BiPredicate<Integer, Integer> isWater
     ) {
+        return computeFromPiecesWithPortals(structuralBounds, buildingBounds, streetBounds, Collections.emptyList(), streetEndpoints, approachMargin, isWater);
+    }
+
+    public static SettlementZone computeFromPiecesWithPortals(
+            SettlementBounds structuralBounds,
+            Collection<SettlementBounds> buildingBounds,
+            Collection<SettlementBounds> streetBounds,
+            Collection<SettlementBounds> streetTerminatorBounds,
+            Collection<BlockPos> streetEndpoints,
+            int approachMargin,
+            BiPredicate<Integer, Integer> isWater
+    ) {
         int margin = Math.max(4, approachMargin);
         ArrayList<SettlementBounds> allPieces = new ArrayList<>();
         if (buildingBounds != null) {
@@ -253,6 +265,13 @@ public class SettlementZone {
             for (SettlementBounds sb : streetBounds) {
                 if (!allPieces.contains(sb)) {
                     allPieces.add(sb);
+                }
+            }
+        }
+        if (streetTerminatorBounds != null) {
+            for (SettlementBounds tb : streetTerminatorBounds) {
+                if (!allPieces.contains(tb)) {
+                    allPieces.add(tb);
                 }
             }
         }
@@ -289,7 +308,21 @@ public class SettlementZone {
         List<Integer> westZList = new ArrayList<>();
         List<Integer> eastZList = new ArrayList<>();
 
-        for (SettlementBounds pb : allPieces) {
+        // Prioridade 1: Street Terminators (pontas extremas de ruas de vila)
+        // Prioridade 2: Street Bounds (vias normais que tocam o perimetro urbano)
+        // Fallback: Se nenhuma via tocar o perimetro, usa pecas em geral
+        Collection<SettlementBounds> candidatePieces = new ArrayList<>();
+        if (streetTerminatorBounds != null && !streetTerminatorBounds.isEmpty()) {
+            candidatePieces.addAll(streetTerminatorBounds);
+        }
+        if (candidatePieces.isEmpty() && streetBounds != null && !streetBounds.isEmpty()) {
+            candidatePieces.addAll(streetBounds);
+        }
+        if (candidatePieces.isEmpty()) {
+            candidatePieces.addAll(allPieces);
+        }
+
+        for (SettlementBounds pb : candidatePieces) {
             // Check North edge contact
             if (pb.minZ() <= urbanCore.minZ() + 1) {
                 int cx = (pb.minX() + pb.maxX()) / 2;
