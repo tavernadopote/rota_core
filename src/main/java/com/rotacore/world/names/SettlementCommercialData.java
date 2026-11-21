@@ -137,38 +137,34 @@ public class SettlementCommercialData {
         };
     }
 
-    /*
-     * WARNING - void declaration
-     */
     public static SettlementCommercialData estimateFromWorkstations(Map<String, Integer> counts, String locale) {
         List<String> secItems;
-        void var4_8;
-        EnumMap<SettlementVocation, Integer> score = new EnumMap<SettlementVocation, Integer>(SettlementVocation.class);
+        EnumMap<SettlementVocation, Integer> score = new EnumMap<>(SettlementVocation.class);
         for (SettlementVocation v : SettlementVocation.values()) {
             score.put(v, 0);
         }
         if (counts != null) {
-            for (Map.Entry entry : counts.entrySet()) {
-                String blockId = (String)entry.getKey();
-                int c = (Integer)entry.getValue();
+            for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+                String blockId = entry.getKey();
+                int c = entry.getValue();
                 SettlementVocation voc = WORKSTATION_MAPPING.get(blockId);
                 if (voc == null) continue;
-                score.put(voc, (Integer)score.get((Object)voc) + c);
+                score.put(voc, score.get(voc) + c);
             }
         }
-        ArrayList sorted = new ArrayList(score.entrySet());
-        sorted.sort((a, b) -> Integer.compare((Integer)b.getValue(), (Integer)a.getValue()));
-        SettlementVocation settlementVocation = SettlementVocation.GENERAL_COMMERCE;
+        ArrayList<Map.Entry<SettlementVocation, Integer>> sorted = new ArrayList<>(score.entrySet());
+        sorted.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+        SettlementVocation primary = SettlementVocation.GENERAL_COMMERCE;
         SettlementVocation secondary = null;
-        if (!sorted.isEmpty() && (Integer)((Map.Entry)sorted.get(0)).getValue() > 0) {
-            SettlementVocation settlementVocation2 = (SettlementVocation)((Object)((Map.Entry)sorted.get(0)).getKey());
-            if (sorted.size() > 1 && (Integer)((Map.Entry)sorted.get(1)).getValue() > 0 && ((Map.Entry)sorted.get(1)).getKey() != settlementVocation2) {
-                secondary = (SettlementVocation)((Object)((Map.Entry)sorted.get(1)).getKey());
+        if (!sorted.isEmpty() && sorted.get(0).getValue() > 0) {
+            primary = sorted.get(0).getKey();
+            if (sorted.size() > 1 && sorted.get(1).getValue() > 0 && sorted.get(1).getKey() != primary) {
+                secondary = sorted.get(1).getKey();
             }
         }
-        String primaryName = var4_8.getDisplayName(locale);
+        String primaryName = primary.getDisplayName(locale);
         String secondaryName = secondary != null ? secondary.getDisplayName(locale) : "";
-        ArrayList<String> items = new ArrayList<String>(SettlementCommercialData.getDefaultTradeItems((SettlementVocation)var4_8, locale));
+        ArrayList<String> items = new ArrayList<>(SettlementCommercialData.getDefaultTradeItems(primary, locale));
         if (secondary != null && !(secItems = SettlementCommercialData.getDefaultTradeItems(secondary, locale)).isEmpty()) {
             items.add(secItems.get(0));
         }
