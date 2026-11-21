@@ -245,8 +245,18 @@ public class SettlementZone {
             BiPredicate<Integer, Integer> isWater
     ) {
         int margin = Math.max(4, approachMargin);
-        Collection<SettlementBounds> primaryPieces = (buildingBounds != null && !buildingBounds.isEmpty()) ? buildingBounds : streetBounds;
-        if (primaryPieces == null || primaryPieces.isEmpty()) {
+        ArrayList<SettlementBounds> allPieces = new ArrayList<>();
+        if (buildingBounds != null) {
+            allPieces.addAll(buildingBounds);
+        }
+        if (streetBounds != null) {
+            for (SettlementBounds sb : streetBounds) {
+                if (!allPieces.contains(sb)) {
+                    allPieces.add(sb);
+                }
+            }
+        }
+        if (allPieces.isEmpty()) {
             SettlementBounds struct = structuralBounds != null ? structuralBounds : new SettlementBounds(-32, -64, -32, 32, 320, 32);
             SettlementBounds approach = struct.expanded(margin);
             return new SettlementZone(struct, struct, approach, Collections.emptyList(), streetEndpoints, "", null, Collections.emptyList());
@@ -258,8 +268,7 @@ public class SettlementZone {
         int pMaxY = Integer.MIN_VALUE;
         int pMinZ = Integer.MAX_VALUE;
         int pMaxZ = Integer.MIN_VALUE;
-        ArrayList<SettlementBounds> piecesList = new ArrayList<>(primaryPieces);
-        for (SettlementBounds pb : piecesList) {
+        for (SettlementBounds pb : allPieces) {
             pMinX = Math.min(pMinX, pb.minX());
             pMaxX = Math.max(pMaxX, pb.maxX());
             pMinY = Math.min(pMinY, pb.minY());
@@ -329,7 +338,7 @@ public class SettlementZone {
             }
         }
 
-        return new SettlementZone(struct, urbanCore, approach, piecesList, streetEndpoints, "", null, portalMap.values());
+        return new SettlementZone(struct, urbanCore, approach, allPieces, streetEndpoints, "", null, portalMap.values());
     }
 
     private static BlockPos snapToPerimeter(BlockPos pos, SettlementBounds perimeter) {
