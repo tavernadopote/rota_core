@@ -15,11 +15,12 @@ public class WayBodyConfig {
     private int clearanceHeight;
     private int barrierSpacing;
     private boolean allowBodyMagnetism;
+    private int mapColor;
     private final List<WayConnectionRule> blacklist;
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
                          int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
-                         List<WayConnectionRule> blacklist) {
+                         int mapColor, List<WayConnectionRule> blacklist) {
         this.bodyType = bodyType;
         this.minLength = minLength;
         this.maxLength = maxLength;
@@ -27,7 +28,15 @@ public class WayBodyConfig {
         this.clearanceHeight = clearanceHeight;
         this.barrierSpacing = barrierSpacing;
         this.allowBodyMagnetism = allowBodyMagnetism;
+        this.mapColor = mapColor;
         this.blacklist = new ArrayList<>(blacklist != null ? blacklist : Collections.emptyList());
+    }
+
+    public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
+                         int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
+                         List<WayConnectionRule> blacklist) {
+        this(bodyType, minLength, maxLength, width, clearanceHeight, barrierSpacing, allowBodyMagnetism,
+                bodyType != null ? bodyType.getDefaultMapColor() : 0xFFFFFFFF, blacklist);
     }
 
     public WayBodyType getBodyType() {
@@ -86,6 +95,14 @@ public class WayBodyConfig {
         this.allowBodyMagnetism = allowBodyMagnetism;
     }
 
+    public int getMapColor() {
+        return mapColor;
+    }
+
+    public void setMapColor(int mapColor) {
+        this.mapColor = mapColor;
+    }
+
     public List<WayConnectionRule> getBlacklist() {
         return Collections.unmodifiableList(blacklist);
     }
@@ -134,6 +151,8 @@ public class WayBodyConfig {
         obj.addProperty("clearance_height", this.clearanceHeight);
         obj.addProperty("barrier_spacing", this.barrierSpacing);
         obj.addProperty("allow_body_magnetism", this.allowBodyMagnetism);
+        obj.addProperty("map_color", String.format("#%08X", this.mapColor));
+
         JsonArray rulesArray = new JsonArray();
         for (WayConnectionRule rule : this.blacklist) {
             rulesArray.add(rule.toJson());
@@ -154,6 +173,17 @@ public class WayBodyConfig {
             int clearance = obj.has("clearance_height") ? obj.get("clearance_height").getAsInt() : type.getDefaultClearanceHeight();
             int barrierSpacing = obj.has("barrier_spacing") ? obj.get("barrier_spacing").getAsInt() : type.getDefaultBarrierSpacing();
             boolean allowMag = !obj.has("allow_body_magnetism") || obj.get("allow_body_magnetism").getAsBoolean();
+
+            int color = type.getDefaultMapColor();
+            if (obj.has("map_color")) {
+                String colorStr = obj.get("map_color").getAsString();
+                if (colorStr.startsWith("#")) {
+                    color = (int) Long.parseLong(colorStr.substring(1), 16);
+                } else {
+                    color = obj.get("map_color").getAsInt();
+                }
+            }
+
             ArrayList<WayConnectionRule> rules = new ArrayList<>();
             if (obj.has("blacklist")) {
                 for (JsonElement el : obj.getAsJsonArray("blacklist")) {
@@ -165,7 +195,7 @@ public class WayBodyConfig {
                     }
                 }
             }
-            return new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, rules);
+            return new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, color, rules);
         } catch (Exception ignored) {
             return null;
         }

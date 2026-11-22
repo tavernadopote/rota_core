@@ -1,5 +1,6 @@
 package com.rotacore.world.routes;
 
+import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -50,6 +51,10 @@ public record ConnectionPole(
         return (dx * dx + dz * dz) <= (this.magneticRadius * this.magneticRadius);
     }
 
+    public CompoundTag save() {
+        return save(new CompoundTag());
+    }
+
     public CompoundTag save(CompoundTag tag) {
         if (tag == null) {
             tag = new CompoundTag();
@@ -86,5 +91,43 @@ public record ConnectionPole(
         boolean maritime = tag.contains("is_maritime") && tag.getBoolean("is_maritime");
         int radius = tag.contains("magnetic_radius") ? tag.getInt("magnetic_radius") : DEFAULT_MAGNETIC_RADIUS;
         return new ConnectionPole(pos, dir, bodyType, owner, maritime, radius);
+    }
+
+    public JsonObject toJson() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("x", this.pos.getX());
+        obj.addProperty("y", this.pos.getY());
+        obj.addProperty("z", this.pos.getZ());
+        obj.addProperty("direction", this.direction.name());
+        obj.addProperty("preferred_body", this.preferredBodyType.name());
+        obj.addProperty("owner_id", this.ownerId);
+        obj.addProperty("is_maritime", this.isMaritime);
+        obj.addProperty("magnetic_radius", this.magneticRadius);
+        return obj;
+    }
+
+    public static ConnectionPole fromJson(JsonObject obj) {
+        if (obj == null || !obj.has("x") || !obj.has("z")) {
+            return null;
+        }
+        int x = obj.get("x").getAsInt();
+        int y = obj.has("y") ? obj.get("y").getAsInt() : 64;
+        int z = obj.get("z").getAsInt();
+        Direction dir = Direction.NORTH;
+        if (obj.has("direction")) {
+            try {
+                dir = Direction.valueOf(obj.get("direction").getAsString());
+            } catch (Exception ignored) {}
+        }
+        WayBodyType bodyType = WayBodyType.ROAD;
+        if (obj.has("preferred_body")) {
+            try {
+                bodyType = WayBodyType.valueOf(obj.get("preferred_body").getAsString());
+            } catch (Exception ignored) {}
+        }
+        String owner = obj.has("owner_id") ? obj.get("owner_id").getAsString() : "";
+        boolean maritime = obj.has("is_maritime") && obj.get("is_maritime").getAsBoolean();
+        int radius = obj.has("magnetic_radius") ? obj.get("magnetic_radius").getAsInt() : DEFAULT_MAGNETIC_RADIUS;
+        return new ConnectionPole(new BlockPos(x, y, z), dir, bodyType, owner, maritime, radius);
     }
 }
