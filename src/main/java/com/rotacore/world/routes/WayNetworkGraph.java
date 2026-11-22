@@ -37,6 +37,10 @@ public class WayNetworkGraph {
     public record ProjectionResult(WayChain chain, WaySegment segment, BlockPos closestPoint, double distanceBlocks) {}
 
     public ProjectionResult findClosestAnchor(BlockPos targetPos, double maxDistanceBlocks) {
+        return findClosestAnchor(targetPos, maxDistanceBlocks, 6.0);
+    }
+
+    public ProjectionResult findClosestAnchor(BlockPos targetPos, double maxDistanceBlocks, double maxVerticalDelta) {
         if (targetPos == null) {
             return null;
         }
@@ -54,6 +58,9 @@ public class WayNetworkGraph {
                     BlockPos a = waypoints.get(i);
                     BlockPos b = waypoints.get(i + 1);
                     BlockPos closest = projectPointOnSegment(targetPos, a, b);
+                    if (maxVerticalDelta > 0 && Math.abs(targetPos.getY() - closest.getY()) > maxVerticalDelta) {
+                        continue;
+                    }
                     double distSq = targetPos.distSqr(closest);
                     if (distSq < bestDistSq) {
                         bestDistSq = distSq;
