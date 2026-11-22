@@ -16,11 +16,23 @@ public class WayBodyConfig {
     private int barrierSpacing;
     private boolean allowBodyMagnetism;
     private int mapColor;
+    private boolean smoothElevation;
+    private int minRunBlocksPerStep;
+    private double horizontalCurvatureWeight;
+    private int minOverheadRock;
+    private boolean canCarveSolid;
+    private boolean detectCaves;
+    private final List<String> biomeWhitelist;
+    private final List<String> biomeBlacklist;
     private final List<WayConnectionRule> blacklist;
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
                          int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
-                         int mapColor, List<WayConnectionRule> blacklist) {
+                         int mapColor, boolean smoothElevation, int minRunBlocksPerStep,
+                         double horizontalCurvatureWeight, int minOverheadRock,
+                         boolean canCarveSolid, boolean detectCaves,
+                         List<String> biomeWhitelist, List<String> biomeBlacklist,
+                         List<WayConnectionRule> blacklist) {
         this.bodyType = bodyType;
         this.minLength = minLength;
         this.maxLength = maxLength;
@@ -29,7 +41,29 @@ public class WayBodyConfig {
         this.barrierSpacing = barrierSpacing;
         this.allowBodyMagnetism = allowBodyMagnetism;
         this.mapColor = mapColor;
+        this.smoothElevation = smoothElevation;
+        this.minRunBlocksPerStep = minRunBlocksPerStep;
+        this.horizontalCurvatureWeight = horizontalCurvatureWeight;
+        this.minOverheadRock = minOverheadRock;
+        this.canCarveSolid = canCarveSolid;
+        this.detectCaves = detectCaves;
+        this.biomeWhitelist = new ArrayList<>(biomeWhitelist != null ? biomeWhitelist : Collections.emptyList());
+        this.biomeBlacklist = new ArrayList<>(biomeBlacklist != null ? biomeBlacklist : Collections.emptyList());
         this.blacklist = new ArrayList<>(blacklist != null ? blacklist : Collections.emptyList());
+    }
+
+    public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
+                         int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
+                         int mapColor, List<WayConnectionRule> blacklist) {
+        this(bodyType, minLength, maxLength, width, clearanceHeight, barrierSpacing, allowBodyMagnetism,
+                mapColor,
+                bodyType != null && bodyType.isDefaultSmoothElevation(),
+                bodyType != null ? bodyType.getDefaultMinRunBlocksPerStep() : 2,
+                bodyType != null ? bodyType.getDefaultHorizontalCurvatureWeight() : 0.3,
+                bodyType != null ? bodyType.getDefaultMinOverheadRock() : 0,
+                bodyType != null && bodyType.isDefaultCanCarveSolid(),
+                bodyType != null && bodyType.isDefaultDetectCaves(),
+                Collections.emptyList(), Collections.emptyList(), blacklist);
     }
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
@@ -103,6 +137,95 @@ public class WayBodyConfig {
         this.mapColor = mapColor;
     }
 
+    public boolean isSmoothElevation() {
+        return smoothElevation;
+    }
+
+    public void setSmoothElevation(boolean smoothElevation) {
+        this.smoothElevation = smoothElevation;
+    }
+
+    public int getMinRunBlocksPerStep() {
+        return minRunBlocksPerStep;
+    }
+
+    public void setMinRunBlocksPerStep(int minRunBlocksPerStep) {
+        this.minRunBlocksPerStep = minRunBlocksPerStep;
+    }
+
+    public double getHorizontalCurvatureWeight() {
+        return horizontalCurvatureWeight;
+    }
+
+    public void setHorizontalCurvatureWeight(double horizontalCurvatureWeight) {
+        this.horizontalCurvatureWeight = horizontalCurvatureWeight;
+    }
+
+    public int getMinOverheadRock() {
+        return minOverheadRock;
+    }
+
+    public void setMinOverheadRock(int minOverheadRock) {
+        this.minOverheadRock = minOverheadRock;
+    }
+
+    public boolean isCanCarveSolid() {
+        return canCarveSolid;
+    }
+
+    public void setCanCarveSolid(boolean canCarveSolid) {
+        this.canCarveSolid = canCarveSolid;
+    }
+
+    public boolean isDetectCaves() {
+        return detectCaves;
+    }
+
+    public void setDetectCaves(boolean detectCaves) {
+        this.detectCaves = detectCaves;
+    }
+
+    public List<String> getBiomeWhitelist() {
+        return Collections.unmodifiableList(biomeWhitelist);
+    }
+
+    public void addBiomeToWhitelist(String biomeId) {
+        if (biomeId != null && !this.biomeWhitelist.contains(biomeId)) {
+            this.biomeWhitelist.add(biomeId);
+        }
+    }
+
+    public void removeBiomeFromWhitelist(String biomeId) {
+        this.biomeWhitelist.remove(biomeId);
+    }
+
+    public List<String> getBiomeBlacklist() {
+        return Collections.unmodifiableList(biomeBlacklist);
+    }
+
+    public void addBiomeToBlacklist(String biomeId) {
+        if (biomeId != null && !this.biomeBlacklist.contains(biomeId)) {
+            this.biomeBlacklist.add(biomeId);
+        }
+    }
+
+    public void removeBiomeFromBlacklist(String biomeId) {
+        this.biomeBlacklist.remove(biomeId);
+    }
+
+    public boolean isBiomeAllowed(String biomeId) {
+        if (biomeId == null) {
+            return true;
+        }
+        if (!this.biomeBlacklist.isEmpty() && this.biomeBlacklist.contains(biomeId)) {
+            return false;
+        }
+        if (!this.biomeWhitelist.isEmpty()) {
+            return this.biomeWhitelist.contains(biomeId);
+        }
+        return true;
+    }
+
     public List<WayConnectionRule> getBlacklist() {
         return Collections.unmodifiableList(blacklist);
     }
@@ -152,6 +275,24 @@ public class WayBodyConfig {
         obj.addProperty("barrier_spacing", this.barrierSpacing);
         obj.addProperty("allow_body_magnetism", this.allowBodyMagnetism);
         obj.addProperty("map_color", String.format("#%08X", this.mapColor));
+        obj.addProperty("smooth_elevation", this.smoothElevation);
+        obj.addProperty("min_run_blocks_per_step", this.minRunBlocksPerStep);
+        obj.addProperty("horizontal_curvature_weight", this.horizontalCurvatureWeight);
+        obj.addProperty("min_overhead_rock", this.minOverheadRock);
+        obj.addProperty("can_carve_solid", this.canCarveSolid);
+        obj.addProperty("detect_caves", this.detectCaves);
+
+        JsonArray wlArr = new JsonArray();
+        for (String b : this.biomeWhitelist) {
+            wlArr.add(b);
+        }
+        obj.add("biome_whitelist", wlArr);
+
+        JsonArray blArr = new JsonArray();
+        for (String b : this.biomeBlacklist) {
+            blArr.add(b);
+        }
+        obj.add("biome_blacklist", blArr);
 
         JsonArray rulesArray = new JsonArray();
         for (WayConnectionRule rule : this.blacklist) {
@@ -184,6 +325,27 @@ public class WayBodyConfig {
                 }
             }
 
+            boolean smoothElev = obj.has("smooth_elevation") ? obj.get("smooth_elevation").getAsBoolean() : type.isDefaultSmoothElevation();
+            int minRun = obj.has("min_run_blocks_per_step") ? obj.get("min_run_blocks_per_step").getAsInt() : type.getDefaultMinRunBlocksPerStep();
+            double curvWeight = obj.has("horizontal_curvature_weight") ? obj.get("horizontal_curvature_weight").getAsDouble() : type.getDefaultHorizontalCurvatureWeight();
+            int minOverhead = obj.has("min_overhead_rock") ? obj.get("min_overhead_rock").getAsInt() : type.getDefaultMinOverheadRock();
+            boolean canCarve = obj.has("can_carve_solid") ? obj.get("can_carve_solid").getAsBoolean() : type.isDefaultCanCarveSolid();
+            boolean detectCaves = obj.has("detect_caves") ? obj.get("detect_caves").getAsBoolean() : type.isDefaultDetectCaves();
+
+            List<String> wl = new ArrayList<>();
+            if (obj.has("biome_whitelist")) {
+                for (JsonElement el : obj.getAsJsonArray("biome_whitelist")) {
+                    wl.add(el.getAsString());
+                }
+            }
+
+            List<String> bl = new ArrayList<>();
+            if (obj.has("biome_blacklist")) {
+                for (JsonElement el : obj.getAsJsonArray("biome_blacklist")) {
+                    bl.add(el.getAsString());
+                }
+            }
+
             ArrayList<WayConnectionRule> rules = new ArrayList<>();
             if (obj.has("blacklist")) {
                 for (JsonElement el : obj.getAsJsonArray("blacklist")) {
@@ -195,7 +357,8 @@ public class WayBodyConfig {
                     }
                 }
             }
-            return new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, color, rules);
+            return new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, color,
+                    smoothElev, minRun, curvWeight, minOverhead, canCarve, detectCaves, wl, bl, rules);
         } catch (Exception ignored) {
             return null;
         }
