@@ -126,19 +126,19 @@ extends Screen {
                 break;
             }
         }
-        this.addRenderableWidget((GuiEventListener)this.listWidget);
-        this.addRenderableWidget((GuiEventListener)new RotaButton(12, 8, 85, 20, (Component)Component.literal((String)"\u2190 Voltar"), btn -> this.saveAndClose()));
-        this.addRenderableWidget((GuiEventListener)new RotaButton(12, this.height - 28, 130, 20, (Component)Component.literal((String)"Restaurar Padr\u00f5es"), btn -> {
+        this.addRenderableWidget(this.listWidget);
+        this.addRenderableWidget(new RotaButton(12, 8, 85, 20, (Component)Component.literal((String)"\u2190 Voltar"), btn -> this.saveAndClose()));
+        this.addRenderableWidget(new RotaButton(12, this.height - 28, 130, 20, (Component)Component.literal((String)"Restaurar Padr\u00f5es"), btn -> {
             this.category.resetDefaults();
             this.listWidget.setOptions(this.category.getOptions());
         }));
-        this.addRenderableWidget((GuiEventListener)new RotaButton(150, this.height - 28, 120, 20, (Component)Component.literal((String)"Salvar Altera\u00e7\u00f5es"), btn -> this.saveAndClose()));
+        this.addRenderableWidget(new RotaButton(150, this.height - 28, 120, 20, (Component)Component.literal((String)"Salvar Altera\u00e7\u00f5es"), btn -> this.saveAndClose()));
         int inspectorX = listWidth + 8;
         int inspectorWidth = this.width - inspectorX - 10;
         this.searchBox = new EditBox(this.font, inspectorX, this.height - 28, inspectorWidth, 20, (Component)Component.literal((String)"Buscar..."));
         this.searchBox.setHint((Component)Component.literal((String)"\u00a78Buscar op\u00e7\u00e3o..."));
         this.searchBox.setResponder(query -> this.listWidget.setFilter((String)query));
-        this.addRenderableWidget((GuiEventListener)this.searchBox);
+        this.addRenderableWidget(this.searchBox);
     }
 
     private void saveAndClose() {
@@ -210,7 +210,10 @@ extends Screen {
             total += titleLinesCount * 12 + 10;
         }
         if (!(canEdit = option.canPlayerEdit(this.minecraft))) {
-            total += 20;
+            String reason = option.getDisabledReason();
+            String reasonText = reason != null ? "\u00a7c[DESATIVADO] \u00a7e" + reason : "\u00a7c[Bloqueado pelo Servidor - Requer Admin]";
+            int reasonLinesCount = this.font != null ? this.font.split((FormattedText)Component.literal(reasonText), innerWidth - 4).size() : 1;
+            total += reasonLinesCount * 11 + 10;
         }
         if (!hasCustom) {
             String desc = option.getDescription();
@@ -278,7 +281,7 @@ extends Screen {
             int innerY = y + 10;
             graphics.drawString(this.font, "\u00a76Ajuda & Descri\u00e7\u00e3o", innerX, innerY, -22016, false);
             graphics.fill(innerX, innerY + 12, innerX + innerWidth, innerY + 13, -12303292);
-            List lines = this.font.split((FormattedText)Component.literal((String)"\u00a77Passe o mouse ou clique sobre qualquer configura\u00e7\u00e3o \u00e0 esquerda para ver a explica\u00e7\u00e3o detalhada, valores padr\u00e3o e dicas de funcionamento."), innerWidth);
+            List<FormattedCharSequence> lines = this.font.split((FormattedText)Component.literal((String)"\u00a77Passe o mouse ou clique sobre qualquer configura\u00e7\u00e3o \u00e0 esquerda para ver a explica\u00e7\u00e3o detalhada, valores padr\u00e3o e dicas de funcionamento."), innerWidth);
             int textY = innerY + 20;
             for (FormattedCharSequence line : lines) {
                 graphics.drawString(this.font, line, innerX, textY, -3355444, false);
@@ -294,7 +297,7 @@ extends Screen {
         int curY = y + 10 - (int)this.inspectorScrollAmount;
         boolean hasCustom = this.focusedOption.hasCustomInspectorRenderer();
         if (!hasCustom) {
-            List titleLines = this.font.split((FormattedText)Component.literal((String)("\u00a76\u00a7l" + this.focusedOption.getTitle().getString())), innerWidth);
+            List<FormattedCharSequence> titleLines = this.font.split((FormattedText)Component.literal((String)("\u00a76\u00a7l" + this.focusedOption.getTitle().getString())), innerWidth);
             for (FormattedCharSequence tLine : titleLines) {
                 graphics.drawString(this.font, tLine, innerX, curY, -22016, false);
                 curY += 12;
@@ -305,15 +308,23 @@ extends Screen {
         boolean canEdit = this.focusedOption.canPlayerEdit(this.minecraft);
         int textY = curY;
         if (!canEdit) {
-            graphics.fill(innerX - 2, textY - 2, innerX + innerWidth + 2, textY + 14, 0x44CC2222);
-            graphics.renderOutline(innerX - 2, textY - 2, innerWidth + 4, 16, -5622989);
-            graphics.drawString(this.font, "\u00a7c[Bloqueado pelo Servidor - Requer Admin]", innerX + 2, textY + 2, -43691, false);
-            textY += 20;
+            String reason = this.focusedOption.getDisabledReason();
+            String reasonText = reason != null ? "\u00a7c[DESATIVADO] \u00a7e" + reason : "\u00a7c[Bloqueado pelo Servidor - Requer Admin]";
+            List<FormattedCharSequence> reasonLines = this.font.split((FormattedText)Component.literal(reasonText), innerWidth - 4);
+            int boxH = reasonLines.size() * 11 + 4;
+            graphics.fill(innerX - 2, textY - 2, innerX + innerWidth + 2, textY + boxH, 0x44CC2222);
+            graphics.renderOutline(innerX - 2, textY - 2, innerWidth + 4, boxH + 2, -5622989);
+            int rY = textY + 1;
+            for (FormattedCharSequence rLine : reasonLines) {
+                graphics.drawString(this.font, rLine, innerX + 2, rY, -43691, false);
+                rY += 11;
+            }
+            textY += boxH + 8;
         }
         if (!hasCustom) {
             String desc = this.focusedOption.getDescription();
             if (desc != null && !desc.isEmpty()) {
-                List descLines = this.font.split((FormattedText)Component.literal((String)("\u00a7f" + desc)), innerWidth);
+                List<FormattedCharSequence> descLines = this.font.split((FormattedText)Component.literal((String)("\u00a7f" + desc)), innerWidth);
                 for (FormattedCharSequence line : descLines) {
                     graphics.drawString(this.font, line, innerX, textY, -1118482, false);
                     textY += 11;
@@ -324,7 +335,7 @@ extends Screen {
                 graphics.fill(innerX - 4, textY - 2, innerX + innerWidth + 4, textY + 1, -13421773);
                 graphics.drawString(this.font, "\u00a7e\u00a7lDica / Exemplo:", innerX, textY += 4, -22016, false);
                 textY += 12;
-                List tipLines = this.font.split((FormattedText)Component.literal((String)("\u00a7b" + this.focusedOption.getExampleTip())), innerWidth);
+                List<FormattedCharSequence> tipLines = this.font.split((FormattedText)Component.literal((String)("\u00a7b" + this.focusedOption.getExampleTip())), innerWidth);
                 for (FormattedCharSequence line : tipLines) {
                     graphics.drawString(this.font, line, innerX, textY, -7807489, false);
                     textY += 11;
@@ -332,7 +343,7 @@ extends Screen {
                 textY += 8;
             }
             if (RotaCategoryScreen.shouldRenderDefaultValue(this.focusedOption)) {
-                List defaultLines = this.font.split((FormattedText)Component.literal((String)("\u00a77Padr\u00e3o recomendado: \u00a7a" + this.focusedOption.getDefaultValueText())), innerWidth);
+                List<FormattedCharSequence> defaultLines = this.font.split((FormattedText)Component.literal((String)("\u00a77Padr\u00e3o recomendado: \u00a7a" + this.focusedOption.getDefaultValueText())), innerWidth);
                 for (FormattedCharSequence line : defaultLines) {
                     graphics.drawString(this.font, line, innerX, textY, -5592406, false);
                     textY += 11;

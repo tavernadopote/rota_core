@@ -573,17 +573,51 @@ public class RotaConfigOption {
         return this.clientOnly;
     }
 
+    private BooleanSupplier enabledSupplier = null;
+    private Supplier<String> disabledReasonSupplier = null;
+
+    public RotaConfigOption enabledIf(BooleanSupplier supplier, String disabledReason) {
+        this.enabledSupplier = supplier;
+        this.disabledReasonSupplier = () -> disabledReason;
+        return this;
+    }
+
+    public RotaConfigOption enabledIf(BooleanSupplier supplier, Supplier<String> disabledReasonSupplier) {
+        this.enabledSupplier = supplier;
+        this.disabledReasonSupplier = disabledReasonSupplier;
+        return this;
+    }
+
+    public boolean isEnabled() {
+        if (this.enabledSupplier != null && !this.enabledSupplier.getAsBoolean()) {
+            return false;
+        }
+        return this.active;
+    }
+
+    public String getDisabledReason() {
+        if (!this.isEnabled()) {
+            if (this.disabledReasonSupplier != null) {
+                return this.disabledReasonSupplier.get();
+            }
+            if (!this.active) {
+                return "Opção inativa nas configurações.";
+            }
+        }
+        return null;
+    }
+
     public RotaConfigOption active(boolean active) {
         this.active = active;
         return this;
     }
 
     public boolean isActive() {
-        return this.active;
+        return this.isEnabled();
     }
 
     public boolean canPlayerEdit(Minecraft mc) {
-        if (!this.active) {
+        if (!this.isEnabled()) {
             return false;
         }
         if (mc == null) {
@@ -595,7 +629,7 @@ public class RotaConfigOption {
     }
 
     public boolean canPlayerEdit(boolean isSingleplayer, boolean hasAdminPermissions) {
-        if (!this.active) {
+        if (!this.isEnabled()) {
             return false;
         }
         if (isSingleplayer) {
