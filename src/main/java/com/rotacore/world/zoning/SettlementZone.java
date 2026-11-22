@@ -98,6 +98,19 @@ public class SettlementZone {
         return Collections.unmodifiableList(terrestrial);
     }
 
+    public List<SettlementPortal> getMaritimePortals() {
+        if (this.portals == null || this.portals.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ArrayList<SettlementPortal> maritime = new ArrayList<>();
+        for (SettlementPortal portal : this.portals) {
+            if (portal.type() == SettlementPortalType.MARITIME) {
+                maritime.add(portal);
+            }
+        }
+        return Collections.unmodifiableList(maritime);
+    }
+
     public String getSettlementName() {
         return this.settlementName;
     }
