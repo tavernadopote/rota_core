@@ -1,6 +1,8 @@
 package com.rotacore.world.zoning;
 
 import com.rotacore.world.names.SettlementCommercialData;
+import com.rotacore.world.routes.ConnectionPole;
+import com.rotacore.world.routes.WayBodyType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -377,6 +380,90 @@ public class SettlementZone {
         }
 
         return new SettlementZone(struct, urbanCore, approach, allPieces, streetEndpoints, "", null, portalMap.values());
+    }
+
+    public static SettlementZone computeForSecondaryStructure(
+            SettlementBounds structuralBounds,
+            Collection<SettlementBounds> pieceBounds,
+            int approachMargin,
+            BiPredicate<Integer, Integer> isWater
+    ) {
+        int margin = Math.max(4, approachMargin);
+        ArrayList<SettlementBounds> allPieces = new ArrayList<>();
+        if (pieceBounds != null) {
+            allPieces.addAll(pieceBounds);
+        }
+        if (allPieces.isEmpty() && structuralBounds != null) {
+            allPieces.add(structuralBounds);
+        }
+        if (allPieces.isEmpty()) {
+            SettlementBounds struct = new SettlementBounds(-16, -64, -16, 16, 320, 16);
+            SettlementBounds approach = struct.expanded(margin);
+            BlockPos singlePortal = new BlockPos(0, 64, approach.minZ());
+            SettlementPortal portal = new SettlementPortal(singlePortal, SettlementPortalType.TERRESTRIAL);
+            return new SettlementZone(struct, struct, approach, Collections.emptyList(), Collections.emptyList(), "", null, List.of(portal));
+        }
+
+        int pMinX = Integer.MAX_VALUE;
+        int pMaxX = Integer.MIN_VALUE;
+        int pMinY = Integer.MAX_VALUE;
+        int pMaxY = Integer.MIN_VALUE;
+        int pMinZ = Integer.MAX_VALUE;
+        int pMaxZ = Integer.MIN_VALUE;
+        for (SettlementBounds pb : allPieces) {
+            pMinX = Math.min(pMinX, pb.minX());
+            pMaxX = Math.max(pMaxX, pb.maxX());
+            pMinY = Math.min(pMinY, pb.minY());
+            pMaxY = Math.max(pMaxY, pb.maxY());
+            pMinZ = Math.min(pMinZ, pb.minZ());
+            pMaxZ = Math.max(pMaxZ, pb.maxZ());
+        }
+        SettlementBounds coreBounds = new SettlementBounds(pMinX, pMinY, pMinZ, pMaxX, pMaxY, pMaxZ);
+        SettlementBounds approach = coreBounds.expanded(margin);
+        SettlementBounds struct = structuralBounds != null ? structuralBounds.union(coreBounds) : coreBounds.expanded(8);
+
+        // Posicionar exatamente UM unico polo/portal na borda amarela (approachBounds)
+        int midX = (approach.minX() + approach.maxX()) / 2;
+        int targetZ = approach.maxZ();
+        int y = Math.max(-60, coreBounds.minY());
+
+        boolean water = isWater != null && isWater.test(midX, targetZ);
+        if (water && isWater != null && !isWater.test(midX, approach.minZ())) {
+            targetZ = approach.minZ();
+            water = false;
+        }
+
+        BlockPos portalPos = new BlockPos(midX, y, targetZ);
+        SettlementPortal singlePortal = new SettlementPortal(portalPos, water ? SettlementPortalType.MARITIME : SettlementPortalType.TERRESTRIAL);
+
+        return new SettlementZone(struct, coreBounds, approach, allPieces, Collections.emptyList(), "", null, List.of(singlePortal));
+    }
+
+    public List<ConnectionPole> toConnectionPoles(String ownerId) {
+        if (this.portals == null || this.portals.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ArrayList<ConnectionPole> result = new ArrayList<>();
+        SettlementBounds approach = this.getApproachPerimeterBounds();
+        for (SettlementPortal portal : this.portals) {
+            BlockPos pPos = portal.pos();
+            Direction dir = Direction.NORTH;
+            if (approach != null) {
+                int dMinZ = Math.abs(pPos.getZ() - approach.minZ());
+                int dMaxZ = Math.abs(pPos.getZ() - approach.maxZ());
+                int dMinX = Math.abs(pPos.getX() - approach.minX());
+                int dMaxX = Math.abs(pPos.getX() - approach.maxX());
+                int min = Math.min(Math.min(dMinZ, dMaxZ), Math.min(dMinX, dMaxX));
+                if (min == dMinZ) dir = Direction.NORTH;
+                else if (min == dMaxZ) dir = Direction.SOUTH;
+                else if (min == dMinX) dir = Direction.WEST;
+                else dir = Direction.EAST;
+            }
+            boolean maritime = portal.type() == SettlementPortalType.MARITIME;
+            WayBodyType preferred = maritime ? WayBodyType.MARITIME : WayBodyType.ROAD;
+            result.add(new ConnectionPole(pPos, dir, preferred, ownerId, maritime));
+        }
+        return result;
     }
 
     private static boolean isFarEnough(int val, List<Integer> list, int minDist) {
