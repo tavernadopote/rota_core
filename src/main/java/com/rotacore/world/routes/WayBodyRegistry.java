@@ -22,9 +22,9 @@ public class WayBodyRegistry {
 
         // 1. Estrada (ROAD) - Cinza Asfalto / Rodovia
         CONFIGS.put(WayBodyType.ROAD, new WayBodyConfig(
-                WayBodyType.ROAD, 32, 400, 3, 4, 0, true,
+                WayBodyType.ROAD, WayBodyType.ROAD.getDefaultMinLength(), WayBodyType.ROAD.getDefaultMaxLength(), WayBodyType.ROAD.getDefaultWidth(), WayBodyType.ROAD.getDefaultClearanceHeight(), WayBodyType.ROAD.getDefaultBarrierSpacing(), WayBodyType.ROAD.isDefaultAllowBodyMagnetism(),
                 WayBodyType.ROAD.getDefaultMapColor(),
-                true, 3, 0.3, 0, false, false,
+                WayBodyType.ROAD.isDefaultSmoothElevation(), WayBodyType.ROAD.getDefaultMinRunBlocksPerStep(), WayBodyType.ROAD.getDefaultHorizontalCurvatureWeight(), WayBodyType.ROAD.getDefaultMinOverheadRock(), WayBodyType.ROAD.isDefaultCanCarveSolid(), WayBodyType.ROAD.isDefaultDetectCaves(),
                 Collections.emptyList(), Collections.emptyList(),
                 List.of(
                         new WayConnectionRule(WayBodyType.ROAD, true, false)
@@ -33,9 +33,9 @@ public class WayBodyRegistry {
 
         // 2. Rota Maritima (MARITIME) - Azul Nautico / Ciano (Pokemon Style: vão de 12 blocos, balizadores a cada 4)
         CONFIGS.put(WayBodyType.MARITIME, new WayBodyConfig(
-                WayBodyType.MARITIME, 32, 500, 12, 0, 4, true,
+                WayBodyType.MARITIME, WayBodyType.MARITIME.getDefaultMinLength(), WayBodyType.MARITIME.getDefaultMaxLength(), WayBodyType.MARITIME.getDefaultWidth(), WayBodyType.MARITIME.getDefaultClearanceHeight(), WayBodyType.MARITIME.getDefaultBarrierSpacing(), WayBodyType.MARITIME.isDefaultAllowBodyMagnetism(),
                 WayBodyType.MARITIME.getDefaultMapColor(),
-                false, 0, 0.1, 0, false, false,
+                WayBodyType.MARITIME.isDefaultSmoothElevation(), WayBodyType.MARITIME.getDefaultMinRunBlocksPerStep(), WayBodyType.MARITIME.getDefaultHorizontalCurvatureWeight(), WayBodyType.MARITIME.getDefaultMinOverheadRock(), WayBodyType.MARITIME.isDefaultCanCarveSolid(), WayBodyType.MARITIME.isDefaultDetectCaves(),
                 List.of("minecraft:ocean", "minecraft:deep_ocean", "minecraft:warm_ocean", "minecraft:lukewarm_ocean",
                         "minecraft:cold_ocean", "minecraft:deep_cold_ocean", "minecraft:frozen_ocean", "minecraft:deep_frozen_ocean", "minecraft:river"),
                 Collections.emptyList(),
@@ -47,9 +47,9 @@ public class WayBodyRegistry {
 
         // 3. Tunel (TUNNEL) - Grafite Escuro / Subterraneo (Massa rochosa minima 6, escava solido e detecta cavernas)
         CONFIGS.put(WayBodyType.TUNNEL, new WayBodyConfig(
-                WayBodyType.TUNNEL, 16, 180, 5, 4, 0, true,
+                WayBodyType.TUNNEL, WayBodyType.TUNNEL.getDefaultMinLength(), WayBodyType.TUNNEL.getDefaultMaxLength(), WayBodyType.TUNNEL.getDefaultWidth(), WayBodyType.TUNNEL.getDefaultClearanceHeight(), WayBodyType.TUNNEL.getDefaultBarrierSpacing(), WayBodyType.TUNNEL.isDefaultAllowBodyMagnetism(),
                 WayBodyType.TUNNEL.getDefaultMapColor(),
-                false, 2, 0.2, 6, true, true,
+                WayBodyType.TUNNEL.isDefaultSmoothElevation(), WayBodyType.TUNNEL.getDefaultMinRunBlocksPerStep(), WayBodyType.TUNNEL.getDefaultHorizontalCurvatureWeight(), WayBodyType.TUNNEL.getDefaultMinOverheadRock(), WayBodyType.TUNNEL.isDefaultCanCarveSolid(), WayBodyType.TUNNEL.isDefaultDetectCaves(),
                 Collections.emptyList(),
                 List.of("minecraft:swamp", "minecraft:mangrove_swamp", "minecraft:beach"),
                 List.of(
@@ -60,9 +60,9 @@ public class WayBodyRegistry {
 
         // 4. Trilha (TRAIL) - Marrom Rustico / Terra Batida (Subida rustica 1 em 1 bloco, alta curvatura 0.8)
         CONFIGS.put(WayBodyType.TRAIL, new WayBodyConfig(
-                WayBodyType.TRAIL, 16, 120, 2, 3, 0, true,
+                WayBodyType.TRAIL, WayBodyType.TRAIL.getDefaultMinLength(), WayBodyType.TRAIL.getDefaultMaxLength(), WayBodyType.TRAIL.getDefaultWidth(), WayBodyType.TRAIL.getDefaultClearanceHeight(), WayBodyType.TRAIL.getDefaultBarrierSpacing(), WayBodyType.TRAIL.isDefaultAllowBodyMagnetism(),
                 WayBodyType.TRAIL.getDefaultMapColor(),
-                false, 2, 0.8, 0, false, false,
+                WayBodyType.TRAIL.isDefaultSmoothElevation(), WayBodyType.TRAIL.getDefaultMinRunBlocksPerStep(), WayBodyType.TRAIL.getDefaultHorizontalCurvatureWeight(), WayBodyType.TRAIL.getDefaultMinOverheadRock(), WayBodyType.TRAIL.isDefaultCanCarveSolid(), WayBodyType.TRAIL.isDefaultDetectCaves(),
                 Collections.emptyList(), Collections.emptyList(),
                 List.of(
                         new WayConnectionRule(WayBodyType.TRAIL, true, false),
@@ -72,9 +72,9 @@ public class WayBodyRegistry {
 
         // 5. Ponte (BRIDGE) - Laranja / Cobre Estrutural (Quase reta 0.05, rampa suave, canCarveSolid desativado por padrao)
         CONFIGS.put(WayBodyType.BRIDGE, new WayBodyConfig(
-                WayBodyType.BRIDGE, 10, 80, 3, 0, 0, false,
+                WayBodyType.BRIDGE, WayBodyType.BRIDGE.getDefaultMinLength(), WayBodyType.BRIDGE.getDefaultMaxLength(), WayBodyType.BRIDGE.getDefaultWidth(), WayBodyType.BRIDGE.getDefaultClearanceHeight(), WayBodyType.BRIDGE.getDefaultBarrierSpacing(), WayBodyType.BRIDGE.isDefaultAllowBodyMagnetism(),
                 WayBodyType.BRIDGE.getDefaultMapColor(),
-                true, 4, 0.05, 0, false, true,
+                WayBodyType.BRIDGE.isDefaultSmoothElevation(), WayBodyType.BRIDGE.getDefaultMinRunBlocksPerStep(), WayBodyType.BRIDGE.getDefaultHorizontalCurvatureWeight(), WayBodyType.BRIDGE.getDefaultMinOverheadRock(), WayBodyType.BRIDGE.isDefaultCanCarveSolid(), WayBodyType.BRIDGE.isDefaultDetectCaves(),
                 Collections.emptyList(), Collections.emptyList(),
                 List.of(
                         new WayConnectionRule(WayBodyType.BRIDGE, true, true),
