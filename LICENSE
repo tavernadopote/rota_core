@@ -1,0 +1,37 @@
+# Taverna do Pote - Termos de Licença e Uso (Todos os Direitos Reservados / Source-Available)
+Copyright (c) 2024-2026 Leandro / Taverna do Pote. Todos os direitos reservados.
+
+Este software e seus arquivos de código-fonte associados são de propriedade exclusiva de Leandro (Taverna do Pote).
+
+Ao acessar, ler, compilar ou utilizar este código-fonte ou os arquivos binários (.jar), você concorda com os seguintes termos:
+
+## 1. Permissões Concedidas (O que é PERMITIDO):
+1. **Acesso e Leitura ao Código-Fonte (Source-Available)**: Você tem permissão para visualizar, navegar e estudar o código-fonte disponibilizado publicamente para fins educacionais, de pesquisa ou compreensão técnica do mod.
+2. **Desenvolvimento de Addons e Uso da API**: Desenvolvedores terceiros têm permissão para vincular (linkar), compilar e interagir com as interfaces e APIs públicas deste mod como dependência em seus próprios mods independentes.
+3. **Inclusão em Modpacks**: Qualquer pessoa tem permissão expressa para incluir os arquivos binários oficiais (.jar) inalterados deste mod em pacotes de mods (modpacks), sejam públicos ou privados (hospedados em CurseForge, Modrinth ou lançadores próprios), sem necessidade de pedir autorização prévia por escrito.
+
+## 2. Restrições Rígidas (O que é PROIBIDO):
+1. **Proibição de Clones e Projetos Derivados ("Forks" Públicos)**: É expressamente proibido pegar este código, renomeá-lo, modificá-lo e publicá-lo como um projeto concorrente, substituto ou independente (exemplo: criar um "Rota Core 2" ou redistribuir com outro nome) sem a autorização formal prévia por escrito do autor original.
+2. **Proibição de Redistribuição de Binários Alterados**: É proibido recompilar o código com alterações e redistribuir os arquivos .jar publicamente.
+3. **Proibição de Venda e Monetização**: É proibido vender, sublicenciar ou cobrar pelo acesso a este código-fonte ou a qualquer compilação derivada dele.
+4. **Preservação de Créditos e Direitos**: Nenhuma menção de autoria ou aviso de direitos autorais pode ser removida do código ou das compilações.
+
+---
+
+# English Version: Terms of License and Use (All Rights Reserved / Source-Available)
+Copyright (c) 2024-2026 Leandro / Taverna do Pote. All rights reserved.
+
+This software and its associated source code are the exclusive property of Leandro (Taverna do Pote).
+
+By viewing, reading, compiling, or using this source code or binaries (.jar), you agree to the following terms:
+
+## 1. Granted Permissions:
+1. **Source-Available Access**: You are allowed to view, read, and inspect the public source code for educational, research, and technical understanding purposes.
+2. **API Usage and Addon Development**: Third-party developers are permitted to reference, link, and build against public APIs and interfaces of this mod as a compilation dependency for their own independent mods.
+3. **Modpack Distribution**: You are expressly permitted to include official, unmodified binaries (.jar) of this mod in public or private modpacks (distributed via CurseForge, Modrinth, etc.) without requiring written permission.
+
+## 2. Strict Restrictions:
+1. **No Forks or Clones**: You are strictly prohibited from copying, rebranding, modifying, and redistributing this mod as an independent or competing project (e.g., publishing a "Rota Core 2") without prior written consent from the author.
+2. **No Modified Binary Redistribution**: You may not distribute modified builds or recompiled binaries of this software.
+3. **No Commercial Use / Monetization**: You may not sell, charge for access, or sub-license the source code or binaries.
+4. **Preservation of Notices**: All copyright and ownership notices must remain intact.

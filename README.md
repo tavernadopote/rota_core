@@ -205,6 +205,7 @@ RotaCoreRegistry.register(new MyModModule());
 
 ---
 
-## Licença
+## Licença e Termos de Uso
 
-Distribuído sob a licença MIT. Criado por Leandro / Rota Mods.
+Este projeto adota o modelo **Todos os Direitos Reservados / Source-Available**.
+O código-fonte está disponível publicamente para estudo e referência técnica, o consumo da API para criação de mods integrados/addons é expressamente permitido, e a inclusão dos binários oficiais em modpacks é autorizada. Clones, bifurcações públicas não autorizadas (ex: "Rota Core 2"), redistribuição de binários alterados e uso comercial são estritamente proibidos. Consulte o arquivo [LICENSE](LICENSE) para os termos legais completos.
