@@ -1,5 +1,6 @@
 name: Deploy Rota Core Documentation to GitHub Pages
 
+# Trigger official deployment
 on:
   push:
     branches:
