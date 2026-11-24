@@ -34,6 +34,7 @@ public class WayBodyConfig {
     private String customBorderBlock = "";
     private String customRailingBlock = "";
     private String customPillarBlock = "";
+    private boolean clearAllAbove = true;
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
                          int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
@@ -190,6 +191,14 @@ public class WayBodyConfig {
 
     public void setCustomPillarBlock(String customPillarBlock) {
         this.customPillarBlock = customPillarBlock != null ? customPillarBlock.trim() : "";
+    }
+
+    public boolean isClearAllAbove() {
+        return clearAllAbove;
+    }
+
+    public void setClearAllAbove(boolean clearAllAbove) {
+        this.clearAllAbove = clearAllAbove;
     }
 
     public int getClearanceHeight() {
@@ -381,6 +390,7 @@ public class WayBodyConfig {
         obj.addProperty("custom_border_block", this.getCustomBorderBlock());
         obj.addProperty("custom_railing_block", this.getCustomRailingBlock());
         obj.addProperty("custom_pillar_block", this.getCustomPillarBlock());
+        obj.addProperty("clear_all_above", this.clearAllAbove);
 
         JsonArray wlArr = new JsonArray();
         for (String b : this.biomeWhitelist) {
@@ -489,6 +499,9 @@ public class WayBodyConfig {
             }
             if (obj.has("custom_pillar_block")) {
                 cfg.setCustomPillarBlock(obj.get("custom_pillar_block").getAsString());
+            }
+            if (obj.has("clear_all_above")) {
+                cfg.setClearAllAbove(obj.get("clear_all_above").getAsBoolean());
             }
             return cfg;
         } catch (Exception ignored) {
