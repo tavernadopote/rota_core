@@ -1,11 +1,11 @@
 package com.rotacore.world.routes;
 
 public enum WayBodyType {
-    ROAD("Estrada", 32, 1400, 3, 4, 0, true, 0xFF3B4252, true, 3, 0.3, 0, false, false),
-    BRIDGE("Ponte", 10, 96, 3, 0, 0, false, 0xFFD97706, true, 4, 0.05, 0, false, true),
-    TUNNEL("Túnel", 16, 600, 5, 4, 0, true, 0xFF4C1D95, false, 2, 0.2, 6, true, true),
+    ROAD("Estrada", 32, 1400, 5, 4, 0, true, 0xFF3B4252, true, 3, 0.3, 0, false, false),
+    BRIDGE("Ponte", 10, 96, 5, 0, 0, false, 0xFFD97706, true, 4, 0.05, 0, false, true),
+    TUNNEL("Túnel", 16, 600, 7, 4, 0, true, 0xFF4C1D95, false, 2, 0.2, 6, true, true),
     MARITIME("Rota Marítima", 32, 1800, 12, 0, 4, true, 0xFF0284C7, false, 0, 0.1, 0, false, false),
-    TRAIL("Trilha", 16, 700, 2, 3, 0, true, 0xFF8B5A2B, false, 2, 0.8, 0, false, false);
+    TRAIL("Trilha", 16, 700, 3, 4, 0, true, 0xFF8B5A2B, false, 2, 0.8, 0, false, false);
 
     private final String displayName;
     private final int defaultMinLength;
