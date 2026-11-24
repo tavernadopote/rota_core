@@ -98,4 +98,13 @@ public enum WayBodyType {
     public boolean isDefaultDetectCaves() {
         return defaultDetectCaves;
     }
+
+    public WayBodyDomain getDefaultDomain() {
+        return switch (this) {
+            case ROAD, TRAIL -> WayBodyDomain.SURFACE;
+            case TUNNEL -> WayBodyDomain.UNDERGROUND;
+            case BRIDGE -> WayBodyDomain.OVER_WATER;
+            case MARITIME -> WayBodyDomain.AQUATIC;
+        };
+    }
 }

@@ -25,6 +25,15 @@ public class WayBodyConfig {
     private final List<String> biomeWhitelist;
     private final List<String> biomeBlacklist;
     private final List<WayConnectionRule> blacklist;
+    private WayBodyDomain domain;
+    private BridgeProfile bridgeProfile = BridgeProfile.FLAT;
+    private int bridgeArchHeight = 3;
+    private boolean useCustomPalette = false;
+    private String customSurfaceBlock = "";
+    private String customSlabBlock = "";
+    private String customBorderBlock = "";
+    private String customRailingBlock = "";
+    private String customPillarBlock = "";
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
                          int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
@@ -34,9 +43,9 @@ public class WayBodyConfig {
                          List<String> biomeWhitelist, List<String> biomeBlacklist,
                          List<WayConnectionRule> blacklist) {
         this.bodyType = bodyType;
-        this.minLength = minLength;
-        this.maxLength = maxLength;
-        this.width = width;
+        this.width = Math.max(1, width);
+        this.minLength = Math.max(minLength, this.width + 1);
+        this.maxLength = Math.max(this.minLength, maxLength);
         this.clearanceHeight = clearanceHeight;
         this.barrierSpacing = barrierSpacing;
         this.allowBodyMagnetism = allowBodyMagnetism;
@@ -50,6 +59,7 @@ public class WayBodyConfig {
         this.biomeWhitelist = new ArrayList<>(biomeWhitelist != null ? biomeWhitelist : Collections.emptyList());
         this.biomeBlacklist = new ArrayList<>(biomeBlacklist != null ? biomeBlacklist : Collections.emptyList());
         this.blacklist = new ArrayList<>(blacklist != null ? blacklist : Collections.emptyList());
+        this.domain = bodyType != null ? bodyType.getDefaultDomain() : WayBodyDomain.SURFACE;
     }
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
@@ -82,7 +92,7 @@ public class WayBodyConfig {
     }
 
     public void setMinLength(int minLength) {
-        this.minLength = minLength;
+        this.minLength = Math.max(minLength, this.width + 1);
     }
 
     public int getMaxLength() {
@@ -90,7 +100,7 @@ public class WayBodyConfig {
     }
 
     public void setMaxLength(int maxLength) {
-        this.maxLength = maxLength;
+        this.maxLength = Math.max(maxLength, this.minLength);
     }
 
     public int getWidth() {
@@ -98,7 +108,88 @@ public class WayBodyConfig {
     }
 
     public void setWidth(int width) {
-        this.width = width;
+        this.width = Math.max(1, width);
+        if (this.minLength <= this.width) {
+            this.minLength = this.width + 1;
+        }
+        if (this.maxLength < this.minLength) {
+            this.maxLength = this.minLength;
+        }
+    }
+
+    public WayBodyDomain getDomain() {
+        if (this.domain == null) {
+            this.domain = this.bodyType != null ? this.bodyType.getDefaultDomain() : WayBodyDomain.SURFACE;
+        }
+        return this.domain;
+    }
+
+    public void setDomain(WayBodyDomain domain) {
+        this.domain = domain != null ? domain : (this.bodyType != null ? this.bodyType.getDefaultDomain() : WayBodyDomain.SURFACE);
+    }
+
+    public BridgeProfile getBridgeProfile() {
+        return this.bridgeProfile != null ? this.bridgeProfile : BridgeProfile.FLAT;
+    }
+
+    public void setBridgeProfile(BridgeProfile bridgeProfile) {
+        this.bridgeProfile = bridgeProfile != null ? bridgeProfile : BridgeProfile.FLAT;
+    }
+
+    public int getBridgeArchHeight() {
+        return bridgeArchHeight;
+    }
+
+    public void setBridgeArchHeight(int bridgeArchHeight) {
+        this.bridgeArchHeight = Math.max(1, Math.min(8, bridgeArchHeight));
+    }
+
+    public boolean isUseCustomPalette() {
+        return useCustomPalette;
+    }
+
+    public void setUseCustomPalette(boolean useCustomPalette) {
+        this.useCustomPalette = useCustomPalette;
+    }
+
+    public String getCustomSurfaceBlock() {
+        return customSurfaceBlock != null ? customSurfaceBlock : "";
+    }
+
+    public void setCustomSurfaceBlock(String customSurfaceBlock) {
+        this.customSurfaceBlock = customSurfaceBlock != null ? customSurfaceBlock.trim() : "";
+    }
+
+    public String getCustomSlabBlock() {
+        return customSlabBlock != null ? customSlabBlock : "";
+    }
+
+    public void setCustomSlabBlock(String customSlabBlock) {
+        this.customSlabBlock = customSlabBlock != null ? customSlabBlock.trim() : "";
+    }
+
+    public String getCustomBorderBlock() {
+        return customBorderBlock != null ? customBorderBlock : "";
+    }
+
+    public void setCustomBorderBlock(String customBorderBlock) {
+        this.customBorderBlock = customBorderBlock != null ? customBorderBlock.trim() : "";
+    }
+
+    public String getCustomRailingBlock() {
+        return customRailingBlock != null ? customRailingBlock : "";
+    }
+
+    public void setCustomRailingBlock(String customRailingBlock) {
+        this.customRailingBlock = customRailingBlock != null ? customRailingBlock.trim() : "";
+    }
+
+    public String getCustomPillarBlock() {
+        return customPillarBlock != null ? customPillarBlock : "";
+    }
+
+    public void setCustomPillarBlock(String customPillarBlock) {
+        this.customPillarBlock = customPillarBlock != null ? customPillarBlock.trim() : "";
     }
 
     public int getClearanceHeight() {
@@ -281,6 +372,15 @@ public class WayBodyConfig {
         obj.addProperty("min_overhead_rock", this.minOverheadRock);
         obj.addProperty("can_carve_solid", this.canCarveSolid);
         obj.addProperty("detect_caves", this.detectCaves);
+        obj.addProperty("domain", this.getDomain().name());
+        obj.addProperty("bridge_profile", this.getBridgeProfile().name());
+        obj.addProperty("bridge_arch_height", this.bridgeArchHeight);
+        obj.addProperty("use_custom_palette", this.useCustomPalette);
+        obj.addProperty("custom_surface_block", this.getCustomSurfaceBlock());
+        obj.addProperty("custom_slab_block", this.getCustomSlabBlock());
+        obj.addProperty("custom_border_block", this.getCustomBorderBlock());
+        obj.addProperty("custom_railing_block", this.getCustomRailingBlock());
+        obj.addProperty("custom_pillar_block", this.getCustomPillarBlock());
 
         JsonArray wlArr = new JsonArray();
         for (String b : this.biomeWhitelist) {
@@ -357,8 +457,40 @@ public class WayBodyConfig {
                     }
                 }
             }
-            return new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, color,
+            WayBodyConfig cfg = new WayBodyConfig(type, minLen, maxLen, width, clearance, barrierSpacing, allowMag, color,
                     smoothElev, minRun, curvWeight, minOverhead, canCarve, detectCaves, wl, bl, rules);
+            if (obj.has("domain")) {
+                try {
+                    cfg.setDomain(WayBodyDomain.valueOf(obj.get("domain").getAsString()));
+                } catch (Exception ignored) {}
+            }
+            if (obj.has("bridge_profile")) {
+                try {
+                    cfg.setBridgeProfile(BridgeProfile.valueOf(obj.get("bridge_profile").getAsString()));
+                } catch (Exception ignored) {}
+            }
+            if (obj.has("bridge_arch_height")) {
+                cfg.setBridgeArchHeight(obj.get("bridge_arch_height").getAsInt());
+            }
+            if (obj.has("use_custom_palette")) {
+                cfg.setUseCustomPalette(obj.get("use_custom_palette").getAsBoolean());
+            }
+            if (obj.has("custom_surface_block")) {
+                cfg.setCustomSurfaceBlock(obj.get("custom_surface_block").getAsString());
+            }
+            if (obj.has("custom_slab_block")) {
+                cfg.setCustomSlabBlock(obj.get("custom_slab_block").getAsString());
+            }
+            if (obj.has("custom_border_block")) {
+                cfg.setCustomBorderBlock(obj.get("custom_border_block").getAsString());
+            }
+            if (obj.has("custom_railing_block")) {
+                cfg.setCustomRailingBlock(obj.get("custom_railing_block").getAsString());
+            }
+            if (obj.has("custom_pillar_block")) {
+                cfg.setCustomPillarBlock(obj.get("custom_pillar_block").getAsString());
+            }
+            return cfg;
         } catch (Exception ignored) {
             return null;
         }
