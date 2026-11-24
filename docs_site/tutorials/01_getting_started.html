@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. Início Rápido & Gradle | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html" class="active">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>1. Início Rápido & Configuração no Gradle</h1>
+            <p class="subtitle">Como integrar o Rota Core no seu ambiente de desenvolvimento NeoForge 1.21.1.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>1. Adicionando a Dependência no build.gradle</h2>
+                <p>Para criar um mod que se conecte ao Rota Core, declare a dependência no seu arquivo <code>build.gradle</code>:</p>
+
+                <pre><code>repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    // Adiciona o Rota Core na esteira de compilação
+    implementation "com.rotacore:rota_core:1.5.0-dev.1"
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. Declarando no neoforge.mods.toml</h2>
+                <p>Informe ao carregador de mods do Minecraft que o seu mod depende do Rota Core:</p>
+
+                <pre><code>[[dependencies.seu_mod_id]]
+    modId="rota_core"
+    type="required"
+    versionRange="[1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"</code></pre>
+            </section>
+
+            <section>
+                <h2>3. Registrando seu Mod via RotaModule</h2>
+                <p>Para que o Rota Core identifique seu mod e adicione sua aba no Hub central, implemente a interface <code>RotaModule</code>:</p>
+
+                <pre><code>package com.exemplo.mod;
+
+import com.rotacore.api.RotaModule;
+import com.rotacore.api.RotaCoreRegistry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
+public class MeuModModule implements RotaModule {
+    @Override
+    public String getModuleId() {
+        return "meu_mod";
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("meu_mod.title");
+    }
+
+    @Override
+    public ResourceLocation getIcon() {
+        return ResourceLocation.fromNamespaceAndPath("meu_mod", "textures/gui/icon.png");
+    }
+}</code></pre>
+
+                <p>E registre-o na inicialização do cliente:</p>
+                <pre><code>RotaCoreRegistry.registerModule(new MeuModModule());</code></pre>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Aba do Novo Mod no Hub Central</p>
+                <span class="hint">Espaço reservado: Print mostrando o ícone e a aba do novo mod registrada no topo do Hub.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="../index.html" class="btn-nav">&larr; Anterior: Visão Geral</a>
+                <a href="02_ui_framework.html" class="btn-nav">Próximo: 2. Framework de Telas & Hub &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

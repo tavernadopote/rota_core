@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7. Nomes & Identidade | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html" class="active">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>7. Motor de Nomenclatura Dinâmica e Identidade Visual</h1>
+            <p class="subtitle">Como o Core batiza vilas por vocação comercial, nomeia estradas e gerencia a identidade de jogadores.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>1. Batismo de Vilas por Vocação Comercial</h2>
+                <p>
+                    O <code>SettlementNamingService</code> não atribui nomes aleatórios: ele inspeciona os blocos de profissão dos aldeões (bancadas de trabalho, fornalhas, composteiras) e os biomas para classificar a <strong>vocação comercial</strong> da vila através da classe <code>SettlementCommercialData</code>:
+                </p>
+                <ul>
+                    <li><code>AGRARIAN</code>: Vilas agrícolas ricas em plantações (ex: *Vale Dourado*, *Granja Verdejante*).</li>
+                    <li><code>MINING</code>: Vilas montanhosas com ferreiros e armeiros (ex: *Forte da Rocha*, *Vila do Ferro*).</li>
+                    <li><code>FISHING</code>: Vilas costeiras com barris e barcos (ex: *Porto das Marés*, *Baía Serena*).</li>
+                    <li><code>SCHOLAR</code>: Vilas com púlpitos e estantes (ex: *Arquivo Ancestral*).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>2. Batismo de Estradas (RouteNamingEngine)</h2>
+                <p>
+                    O motor de nomes viários suporta diferentes estilos configuráveis através do <code>RouteNamingStyle</code>:
+                </p>
+                <ul>
+                    <li><strong>Numérico Oficial</strong>: Padrão de rodovias federais/estaduais (ex: <em>Rota 101</em>, <em>Rodovia RC-04</em>).</li>
+                    <li><strong>Geográfico</strong>: Nomeia a rota conectando os nomes das duas vilas unidas (ex: <em>Estrada Porto-Pedra</em>).</li>
+                    <li><strong>Fantasia Medieval</strong>: Nomes poéticos e tradicionais (ex: <em>Trilha do Peregrino</em>, <em>Via do Rei</em>).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>3. Identidade Visual de Jogadores (RotaPlayerIdentity)</h2>
+                <p>
+                    O Core fornece o cadastro de identidade <code>RotaPlayerIdentity</code>, que associa a cada jogador no servidor uma cor e assinatura persistente salva em JSON. Isso permite que minimapas (Rota Map) e diários (Questbook) mostrem ícones e marcadores com as cores oficiais de cada jogador sem divergência.
+                </p>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Placa de Identificação de Vila e Nomes no Minimapa</p>
+                <span class="hint">Espaço reservado: Print mostrando uma vila batizada com seu nome de vocação e a rota numerada conectando a ela.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="06_topographic_viability.html" class="btn-nav">&larr; Anterior: 6. Viabilidade Anti-Abismo</a>
+                <a href="../index.html" class="btn-nav">&uarr; Voltar para o Início</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

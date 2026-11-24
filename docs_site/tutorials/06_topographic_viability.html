@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6. Viabilidade Anti-Abismo | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html" class="active">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>6. Viabilidade Topográfica e Geração de Mundo</h1>
+            <p class="subtitle">O serviço que avalia a integridade do terreno e previne estruturas geradas em abismos.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>O Problema das Vilas Deformadas no Minecraft</h2>
+                <p>
+                    No Minecraft vanilla e com mods de estruturas adicionais, é comum encontrar vilas gerando cortadas por ravinas profundas, casas flutuando no ar sobre abismos ou hortas submersas no fundo de oceanos.
+                </p>
+                <p>
+                    O <code>SettlementViabilityService</code> do Rota Core foi desenvolvido para resolver isso de raiz: ele intercepta a colocação de estruturas através de mixins nativos (<code>StructurePlacementMixin</code>) e faz uma amostragem matemática de altura (<em>height sampling</em>) do terreno.
+                </p>
+            </section>
+
+            <section>
+                <h2>Como Funciona a Avaliação de Viabilidade</h2>
+                <ol>
+                    <li><strong>Desvio Padrão de Altura</strong>: Se a variação de Y dentro do envelope da vila for extrema (indicando penhasco ou desfiladeiro), a estrutura é rejeitada ou realocada.</li>
+                    <li><strong>Filtro de Lâmina d'Água</strong>: Garante que estruturas terrestres não sejam geradas no meio de fossas oceânicas.</li>
+                    <li><strong>Ancoragem Firme</strong>: Garante que os caminhos e fundações possuam solo contíguo antes de gerar.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Utilizando o Serviço de Viabilidade em Outros Mods</h2>
+                <pre><code>package com.exemplo.mod;
+
+import com.rotacore.world.viability.SettlementViabilityService;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+
+public class GeradorDePostoAvancado {
+    public boolean podeGerarNesteLocal(LevelAccessor level, BlockPos pos) {
+        // Avalia um raio de 32 blocos ao redor
+        SettlementViabilityService.ViabilityResult resultado = 
+            SettlementViabilityService.evaluateViability(level, pos, 32);
+
+        if (!resultado.isViable()) {
+            System.out.println("Local rejeitado pelo Rota Core: " + resultado.getReason());
+            return false;
+        }
+
+        return true;
+    }
+}</code></pre>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Comparação: Vila com e sem o Filtro de Viabilidade</p>
+                <span class="hint">Espaço reservado: Print mostrando uma vila perfeitamente assentada em terreno suave graças ao filtro do Core.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="05_route_planning.html" class="btn-nav">&larr; Anterior: 5. Rotas & Grafos Viários</a>
+                <a href="07_names_and_identity.html" class="btn-nav">Próximo: 7. Nomes & Identidade &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

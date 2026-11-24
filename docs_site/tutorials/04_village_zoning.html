@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. Zoneamento Trifásico | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html" class="active">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>4. Zoneamento Cadastral Trifásico de Vilas</h1>
+            <p class="subtitle">O modelo de 3 anéis concêntricos que protege assentamentos contra destruição por estradas e obras.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>O Modelo dos 3 Anéis Concêntricos</h2>
+                <p>
+                    Todas as vilas e estruturas catalogadas pelo Rota Core são representadas através da classe imutável <code>SettlementZone</code>, dividida em 3 camadas de segurança:
+                </p>
+                <ol>
+                    <li>
+                        <strong>Reserva Estrutural (Borda Roxa - <code>structuralBounds</code>)</strong>:
+                        A caixa delimitadora original gerada pelo Minecraft/CTOV.
+                    </li>
+                    <li>
+                        <strong>Núcleo Urbano (Borda Verde - <code>urbanCoreBounds</code>)</strong>:
+                        O polígono justo que envolve estritamente as casas habitadas, camas, praça central e sinos. <em>Área sagrada: nenhum bloco aqui pode ser quebrado por estradas.</em>
+                    </li>
+                    <li>
+                        <strong>Perímetro de Aproximação (Borda Amarela - <code>approachPerimeterBounds</code>)</strong>:
+                        Faixa externa de segurança (8 a 12 blocos de recuo). É aqui onde as estradas devem parar e ancorar nos portais viários homologados, sem rasgar a vila ao meio.
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>1. Consultando uma Vila no Mundo</h2>
+                <pre><code>package com.exemplo.mod;
+
+import com.rotacore.world.zoning.SettlementZone;
+import com.rotacore.world.zoning.StructureZoneRegistry;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+
+public class ServicoDeObras {
+    public void verificarProximidade(ServerLevel level, BlockPos pos) {
+        // Consulta no Core em O(1) sem lag
+        SettlementZone vilaProxima = StructureZoneRegistry.getZoneAt(level, pos);
+
+        if (vilaProxima != null) {
+            if (vilaProxima.isInsideUrbanCore(pos)) {
+                // Bloqueia qualquer obra física aqui
+                System.out.println("Posição dentro das casas da vila: " + vilaProxima.getName());
+            } else if (vilaProxima.isInsideApproachPerimeter(pos)) {
+                System.out.println("Posição no perímetro externo de aproximação viária!");
+            }
+        }
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. Grade Regional de Alta Performance (RegionalGrid)</h2>
+                <p>
+                    Para evitar buscas espaciais pesadas que causam congelamento na thread do servidor (tick freeze), o Core organiza todas as estruturas em células da <code>RegionalGrid</code>.
+                </p>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Visualização Cadastral dos Anéis da Vila</p>
+                <span class="hint">Espaço reservado: Print mostrando os 3 perímetros de uma vila (Borda Verde no centro urbano e Borda Amarela de aproximação viária).</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="03_hud_manager.html" class="btn-nav">&larr; Anterior: 3. Gerenciador de HUDs</a>
+                <a href="05_route_planning.html" class="btn-nav">Próximo: 5. Rotas & Grafos Viários &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

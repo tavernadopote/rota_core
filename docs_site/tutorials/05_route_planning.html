@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. Rotas & Grafos Viários | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html" class="active">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>5. Planejamento Mestre de Rotas e Grafos Viários</h1>
+            <p class="subtitle">O motor matemático de traçado de rotas por Splines e curvas de nível topográficas.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>O Grafo Mestre de Vias (MasterRouteGraph)</h2>
+                <p>
+                    O Rota Core mantém a malha teórica de conexões entre vilas, portos, postos avançados e pontos de interesse em um grafo matemático chamado <code>MasterRouteGraph</code>.
+                </p>
+                <p>
+                    Em vez de traçar linhas retas cegas que cortam montanhas ao meio, o Core possui o <code>ContourRoutePlanner</code>, que calcula caminhos suaves acompanhando o relevo natural do terreno.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. Consultando uma Rota Teórica via Spline</h2>
+                <pre><code>package com.exemplo.mod;
+
+import com.rotacore.world.routes.MasterRouteGraph;
+import com.rotacore.world.routes.SplineRoute;
+import net.minecraft.core.BlockPos;
+
+public class ConsultaViaria {
+    public void obterTrajeto(BlockPos origem, BlockPos destino) {
+        // Obtém o traçado suave calculado pelo Core
+        SplineRoute rota = MasterRouteGraph.getRouteBetween(origem, destino);
+
+        if (rota != null) {
+            System.out.println("Comprimento da rota: " + rota.getLength() + " blocos");
+            System.out.println("Nível da via (Tier): " + rota.getTier());
+
+            // Itera pelos pontos de passagem (Waypoints) suavizados
+            for (BlockPos ponto : rota.getSampledPoints(1.0f)) {
+                // Posição exata calculada com greide suave
+            }
+        }
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. Corpos de Vias (WayBodyType)</h2>
+                <p>
+                    O Core categoriza as vias em tipos cadastrais através do <code>WayBodyType</code>:
+                </p>
+                <ul>
+                    <li><code>HIGHWAY</code>: Rodovia principal de grande fluxo (geralmente alvenaria de pedra e maior largura).</li>
+                    <li><code>RURAL_PATH</code>: Estrada secundária ou rural (terra batida, cascalho e trilhas).</li>
+                    <li><code>WATERWAY</code>: Hidrovia ou canal de navegação marítimo.</li>
+                </ul>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Traçado Suave de Rota com Curvas de Nível</p>
+                <span class="hint">Espaço reservado: Print aéreo mostrando a estrada serpenteando uma montanha com greide suave planejado pelo Core.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="04_village_zoning.html" class="btn-nav">&larr; Anterior: 4. Zoneamento Trifásico</a>
+                <a href="06_topographic_viability.html" class="btn-nav">Próximo: 6. Viabilidade Anti-Abismo &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

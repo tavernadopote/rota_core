@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Oficial do Rota Core | Documentação e Tutoriais</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="active">Visão Geral & Filosofia</a></li>
+                    <li><a href="tutorials/01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="tutorials/02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="tutorials/03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="tutorials/04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="tutorials/05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="tutorials/06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="tutorials/07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>Guia Oficial do Rota Core</h1>
+            <p class="subtitle">A fundação central compartilhada, cérebro cadastral e framework de UI para a suíte Rota Mods.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>A Analogia da Prefeitura</h2>
+                <p>
+                    O <strong>Rota Core</strong> opera sob o princípio da administração pública municipal: ele atua como a <strong>Prefeitura e o Cartório Central</strong> do mundo de Minecraft.
+                </p>
+                <p>
+                    Ele é responsável por calcular a geopolítica por Seed, catalogar o relevo, planejar onde devem passar as vias de integração, unificar telas de configuração e fornecer a esteira de HUDs.
+                </p>
+
+                <div class="alert-note">
+                    <strong>Regra de Ouro do Rota Core</strong>
+                    O Rota Core é puramente cadastral, lógico e conceitual: ele nunca assenta blocos físicos no mundo nem executa obras pesadas. Os mods satélites (como o Rota Roads) atuam como empreiteiras que consultam esses dados e realizam as alterações físicas.
+                </div>
+            </section>
+
+            <section>
+                <h2>Os 7 Pilares Técnicos do Rota Core</h2>
+                <ol>
+                    <li><strong>Integração de Módulos (RotaModule & Registry)</strong>: Registro central de mods satélites e categorias.</li>
+                    <li><strong>Framework de Telas (Hub Tecla 'O')</strong>: Sistema de interfaces em 2 colunas com lista de opções e painel lateral Inspector.</li>
+                    <li><strong>Gerenciador de HUD Interativo</strong>: HUDs arrastáveis e redimensionáveis pelo jogador via <code>IRotaHudElement</code>.</li>
+                    <li><strong>Zoneamento Cadastral Trifásico</strong>: Modelagem de vilas em anéis (Estrutural, Urbano e Perímetro de Aproximação).</li>
+                    <li><strong>Grafos e Planejamento de Rotas</strong>: Traçado matemático suave com Splines e curvas de nível topográficas.</li>
+                    <li><strong>Filtro de Viabilidade Topográfica</strong>: Prevenção nativa contra vilas geradas sobre abismos, fendas ou lagos deformados.</li>
+                    <li><strong>Motor de Nomenclatura e Identidade</strong>: Batismo dinâmico de vilas por vocação comercial e rotas viárias.</li>
+                </ol>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Interface Principal do Hub Rota Core</p>
+                <span class="hint">Espaço reservado: Tela do menu principal de módulos e configurações.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <div></div>
+                <a href="tutorials/01_getting_started.html" class="btn-nav">Próximo: 1. Início Rápido & Gradle &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

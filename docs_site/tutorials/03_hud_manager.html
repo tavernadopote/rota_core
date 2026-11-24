@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. Gerenciador de HUDs | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html" class="active">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>3. Gerenciador Universal de HUD Interativo</h1>
+            <p class="subtitle">Como criar elementos de interface arrastáveis e redimensionáveis pelo jogador.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>A Filosofia do IRotaHudElement</h2>
+                <p>
+                    Em vez de cada mod inventar um sistema próprio de coordenadas e telas de personalização de HUD, o Rota Core centraliza tudo.
+                </p>
+                <p>
+                    Quando seu mod registra um <code>IRotaHudElement</code>, o jogador ganha automaticamente o poder de abrir a tela <code>RotaHudEditScreen</code> para <strong>arrastar seu elemento pela tela com o mouse, mudar a escala, alterar a opacidade e travar em pontos de ancoragem</strong>.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. Implementando o Elemento de HUD</h2>
+                <pre><code>package com.exemplo.mod.client.hud;
+
+import com.rotacore.client.gui.hud.IRotaHudElement;
+import com.rotacore.client.gui.hud.RotaHudAnchor;
+import net.minecraft.client.gui.GuiGraphics;
+
+public class VelocimetroHudElement implements IRotaHudElement {
+    @Override
+    public String getId() {
+        return "meu_mod:velocimetro";
+    }
+
+    @Override
+    public int getWidth() {
+        return 80;
+    }
+
+    @Override
+    public int getHeight() {
+        return 24;
+    }
+
+    @Override
+    public RotaHudAnchor getDefaultAnchor() {
+        return RotaHudAnchor.BOTTOM_LEFT;
+    }
+
+    @Override
+    public void render(GuiGraphics graphics, float partialTick) {
+        // Seu código de desenho na tela (texturas, textos, valores)
+        graphics.drawString(Minecraft.getInstance().font, "120 km/h", 4, 8, 0xFFFFFF);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. Registrando no RotaHudRegistry</h2>
+                <pre><code>RotaHudRegistry.register(new VelocimetroHudElement());</code></pre>
+                <p>
+                    O Rota Core cuidará da persistência em disco das coordenadas escolhidas pelo jogador, sem que você precise escrever uma única linha de código de salvamento.
+                </p>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Tela Interativa de Edição e Arraste de HUD</p>
+                <span class="hint">Espaço reservado: Print da tela do RotaHudEditScreen mostrando os elementos com caixas delimitadoras e guias de alinhamento.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="02_ui_framework.html" class="btn-nav">&larr; Anterior: 2. Framework de Telas</a>
+                <a href="04_village_zoning.html" class="btn-nav">Próximo: 4. Zoneamento Trifásico &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

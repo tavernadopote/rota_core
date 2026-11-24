@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Framework de Telas & Hub | Guia do Rota Core</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div>
+                <h1>Rota Core</h1>
+                <span class="badge">NeoForge 1.21.1</span>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-title">Introdução</div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Visão Geral & Filosofia</a></li>
+                    <li><a href="01_getting_started.html">1. Início Rápido & Gradle</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Tutoriais da API</div>
+                <ul class="nav-links">
+                    <li><a href="02_ui_framework.html" class="active">2. Framework de Telas & Hub</a></li>
+                    <li><a href="03_hud_manager.html">3. Gerenciador de HUDs</a></li>
+                    <li><a href="04_village_zoning.html">4. Zoneamento Trifásico</a></li>
+                    <li><a href="05_route_planning.html">5. Rotas & Grafos Viários</a></li>
+                    <li><a href="06_topographic_viability.html">6. Viabilidade Anti-Abismo</a></li>
+                    <li><a href="07_names_and_identity.html">7. Nomes & Identidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="content-header">
+            <h1>2. Framework de Telas, Opções e Componentes UI</h1>
+            <p class="subtitle">Como criar telas de configuração padronizadas com layout em 2 colunas e painel lateral Inspector.</p>
+        </header>
+
+        <article>
+            <section>
+                <h2>A Estrutura de Duas Colunas do Rota Core</h2>
+                <p>
+                    O Rota Core padronizou todas as telas de opções do jogo através da classe <code>RotaCategoryScreen</code>:
+                </p>
+                <ul>
+                    <li><strong>Coluna da Esquerda (~67%)</strong>: Lista rolável contendo controles interativos (botões, switches, sliders).</li>
+                    <li><strong>Coluna da Direita (~33% - Inspector)</strong>: Painel lateral inteligente que exibe busca, título, descrição aprofundada, avisos e pré-visualização gráfica da opção que estiver com o cursor do mouse posicionado.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. Registrando uma Categoria de Opções</h2>
+                <pre><code>package com.exemplo.mod;
+
+import com.rotacore.api.RotaCategory;
+import com.rotacore.config.RotaConfigOption;
+import net.minecraft.network.chat.Component;
+
+public class OpcoesGeraisCategory extends RotaCategory {
+    public OpcoesGeraisCategory() {
+        super("geral", Component.translatable("meu_mod.category.geral"));
+
+        // Adiciona um switch (liga/desliga)
+        this.addOption(RotaConfigOption.createBoolean(
+            "ativar_recurso",
+            Component.translatable("meu_mod.opt.ativar"),
+            Component.translatable("meu_mod.opt.ativar.desc"),
+            true, // valor padrão
+            val -> salvarConfig(val)
+        ));
+
+        // Adiciona um slider numérico
+        this.addOption(RotaConfigOption.createIntSlider(
+            "limite_distancia",
+            Component.translatable("meu_mod.opt.distancia"),
+            Component.translatable("meu_mod.opt.distancia.desc"),
+            10, 100, 50, // min, max, default
+            val -> atualizarDistancia(val)
+        ));
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. Widgets Modais Reutilizáveis</h2>
+                <p>O Rota Core disponibiliza componentes modais prontos para uso:</p>
+                <ul>
+                    <li><code>ItemCatalogModalWidget</code>: Abre uma janela interna com catálogo de todos os blocos e itens registrados no Minecraft com busca e seleção com 1 clique.</li>
+                    <li><code>ConfirmModalWidget</code>: Janela de confirmação para ações destrutivas (ex: restaurar padrões).</li>
+                    <li><code>OptionPickerModalWidget</code>: Seletor pop-up moderno para enums e listas.</li>
+                </ul>
+            </section>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">[PRINT DO JOGO]</span>
+                <p class="caption">Tela em Duas Colunas com o Painel Inspector</p>
+                <span class="hint">Espaço reservado: Print mostrando os switches na esquerda e a explicação detalhada no painel lateral direito.</span>
+            </div>
+
+            <footer class="doc-footer">
+                <a href="01_getting_started.html" class="btn-nav">&larr; Anterior: 1. Início Rápido</a>
+                <a href="03_hud_manager.html" class="btn-nav">Próximo: 3. Gerenciador de HUDs &rarr;</a>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>
