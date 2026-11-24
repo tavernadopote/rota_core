@@ -35,6 +35,7 @@ public class WayBodyConfig {
     private String customRailingBlock = "";
     private String customPillarBlock = "";
     private boolean clearAllAbove = true;
+    private boolean removeConnectedTrees = false;
 
     public WayBodyConfig(WayBodyType bodyType, int minLength, int maxLength, int width,
                          int clearanceHeight, int barrierSpacing, boolean allowBodyMagnetism,
@@ -199,6 +200,14 @@ public class WayBodyConfig {
 
     public void setClearAllAbove(boolean clearAllAbove) {
         this.clearAllAbove = clearAllAbove;
+    }
+
+    public boolean isRemoveConnectedTrees() {
+        return removeConnectedTrees;
+    }
+
+    public void setRemoveConnectedTrees(boolean removeConnectedTrees) {
+        this.removeConnectedTrees = removeConnectedTrees;
     }
 
     public int getClearanceHeight() {
@@ -391,6 +400,7 @@ public class WayBodyConfig {
         obj.addProperty("custom_railing_block", this.getCustomRailingBlock());
         obj.addProperty("custom_pillar_block", this.getCustomPillarBlock());
         obj.addProperty("clear_all_above", this.clearAllAbove);
+        obj.addProperty("remove_connected_trees", this.removeConnectedTrees);
 
         JsonArray wlArr = new JsonArray();
         for (String b : this.biomeWhitelist) {
@@ -502,6 +512,9 @@ public class WayBodyConfig {
             }
             if (obj.has("clear_all_above")) {
                 cfg.setClearAllAbove(obj.get("clear_all_above").getAsBoolean());
+            }
+            if (obj.has("remove_connected_trees")) {
+                cfg.setRemoveConnectedTrees(obj.get("remove_connected_trees").getAsBoolean());
             }
             return cfg;
         } catch (Exception ignored) {
